@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LabSul — Laboratório de Formação em Cultura Popular Nordestina e Ibérica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════
+   TOKENS
+═══════════════════════════════ */
+:root {
+  --papel:   #F7EED8;
+  --papel-dk:#EDE0C4;
+  --tinta:   #1A1714;
+  --verm:    #C0321E;
+  --verm-lt: #D94E36;
+  --indigo:  #1C3557;
+  --indigo-lt:#2B4F80;
+  --ocre:    #A8722A;
+  --ocre-lt: #C8902E;
+  --branco:  #FDFAF4;
+  --cinza:   #5C5450;
+  --cinza-lt:#8A837C;
+}
+ 
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--branco);color:var(--tinta);
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+ 
+/* ═══════════════════════════════
+   NAV
+═══════════════════════════════ */
+#nav {
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.95rem 5%;
+  background:rgba(28,53,87,0.97);
+  backdrop-filter:blur(12px);
+  border-bottom:2px solid var(--verm);
+  transition:padding .3s;
+}
+#nav.scrolled{padding:.65rem 5%}
+.nav-logo{
+  font-family:'Instrument Serif',serif;
+  font-size:1.55rem;color:var(--papel);
+  text-decoration:none;letter-spacing:-.01em;
+  display:flex;align-items:baseline;gap:.3rem;
+}
+.nav-logo-accent{color:var(--ocre-lt);font-style:italic}
+.nav-logo-sub{
+  font-family:'DM Sans',sans-serif;font-size:.65rem;font-weight:300;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(247,238,216,.45);margin-left:.4rem;
+}
+.nav-links{
+  display:flex;gap:2rem;list-style:none;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.nav-links a{
+  color:rgba(247,238,216,.65);text-decoration:none;
+  padding:.3rem 0;border-bottom:1px solid transparent;
+  transition:color .2s,border-color .2s;
+}
+.nav-links a:hover{color:var(--ocre-lt);border-color:var(--ocre-lt)}
+.nav-cta{
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:.5rem 1.4rem;
+  background:var(--verm);color:var(--papel);
+  text-decoration:none;transition:background .2s;
+  border:none;cursor:pointer;
+}
+.nav-cta:hover{background:var(--verm-lt)}
+.hamburger{
+  display:none;flex-direction:column;gap:5px;
+  cursor:pointer;padding:4px;background:none;border:none;
+}
+.hamburger span{width:22px;height:2px;background:var(--papel);display:block;transition:transform .3s,opacity .3s}
+.mobile-menu{
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:var(--indigo);z-index:400;
+  flex-direction:column;align-items:center;justify-content:center;gap:2rem;
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{
+  font-family:'Instrument Serif',serif;font-size:2rem;
+  color:var(--papel);text-decoration:none;
+}
+.mobile-menu a:hover{color:var(--ocre-lt)}
+ 
+/* ═══════════════════════════════
+   HERO — Xilogravura
+═══════════════════════════════ */
+#hero{
+  min-height:100vh;
+  background:var(--indigo);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;
+}
+ 
+/* Xilogravura background — pattern inspired by woodcut prints */
+.xilo-bg {
+  position:absolute;inset:0;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  grid-template-rows:repeat(5,1fr);
+  gap:0;opacity:.09;pointer-events:none;
+}
+.xilo-cell{
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(2.5rem,4vw,5rem);
+  color:var(--ocre);
+  animation:xilo-pulse 8s ease-in-out infinite;
+}
+.xilo-cell:nth-child(odd){animation-delay:1s}
+.xilo-cell:nth-child(3n){animation-delay:2s}
+@keyframes xilo-pulse{0%,100%{opacity:.6}50%{opacity:1}}
+ 
+/* Large decorative cordel text */
+.hero-bg-text{
+  position:absolute;right:-2%;top:50%;
+  transform:translateY(-50%);
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(12rem,20vw,22rem);
+  font-style:italic;font-weight:400;
+  color:rgba(247,238,216,.04);
+  line-height:.85;white-space:nowrap;
+  pointer-events:none;user-select:none;
+  letter-spacing:-.04em;
+}
+ 
+.hero-inner{
+  position:relative;z-index:2;
+  max-width:1200px;margin:0 auto;
+  padding:9rem 5% 6rem;
+  display:grid;
+  grid-template-columns:1fr 420px;
+  gap:5rem;align-items:end;
+}
+ 
+.hero-left{}
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ocre-lt);margin-bottom:2rem;
+}
+.hero-kicker::before,
+.hero-kicker::after{content:'';flex:0 0 20px;height:1px;background:var(--ocre-lt)}
+ 
+.hero-h1{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(3.2rem,6vw,5.5rem);
+  font-weight:400;line-height:.95;
+  color:var(--papel);letter-spacing:-.025em;
+  margin-bottom:.5rem;
+}
+.hero-h1 .line-italic{
+  font-style:italic;color:var(--ocre-lt);
+  display:block;font-size:clamp(3.8rem,7vw,6.5rem);
+}
+.hero-h1 .line-sm{
+  font-size:clamp(2rem,3.5vw,3.2rem);
+  color:rgba(247,238,216,.75);font-style:normal;display:block;
+}
+ 
+.hero-rule{
+  width:60px;height:3px;background:var(--verm);
+  margin:2rem 0;
+}
+ 
+.hero-desc{
+  font-size:1.05rem;line-height:1.8;
+  color:rgba(247,238,216,.68);
+  max-width:500px;margin-bottom:2.5rem;
+}
+ 
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-verm{
+  display:inline-block;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:.9rem 2.2rem;
+  background:var(--verm);color:var(--papel);
+  text-decoration:none;transition:background .2s;
+}
+.btn-verm:hover{background:var(--verm-lt)}
+.btn-wire{
+  display:inline-block;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:.9rem 2.2rem;
+  border:1px solid rgba(247,238,216,.25);
+  color:rgba(247,238,216,.75);
+  text-decoration:none;transition:border-color .2s,color .2s;
+}
+.btn-wire:hover{border-color:var(--ocre-lt);color:var(--ocre-lt)}
+ 
+/* Hero right — photo + data card */
+.hero-right{
+  display:flex;flex-direction:column;gap:2px;
+}
+.hero-photo-card{
+  position:relative;background:var(--indigo-lt);
+  overflow:hidden;
+}
+.hero-photo-card img{
+  width:100%;aspect-ratio:3/4;object-fit:cover;
+  object-position:top center;
+  filter:grayscale(20%) contrast(1.05);
+  transition:filter .4s;
+}
+.hero-photo-card:hover img{filter:grayscale(0%) contrast(1)}
+.hero-photo-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:1.5rem 1.6rem;
+  background:linear-gradient(transparent,rgba(28,53,87,.92));
+}
+.hpo-name{
+  font-family:'Libre Baskerville',serif;font-size:1.05rem;font-weight:700;
+  color:var(--papel);
+}
+.hpo-role{
+  font-family:'DM Sans',sans-serif;font-size:.72rem;
+  color:rgba(247,238,216,.6);margin-top:.25rem;letter-spacing:.04em;
+}
+ 
+.hero-data-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:var(--verm);gap:1px;
+}
+.hds-item{
+  padding:.9rem 1rem;background:var(--tinta);
+  text-align:center;
+}
+.hds-n{
+  font-family:'Instrument Serif',serif;font-size:1.8rem;
+  color:var(--ocre-lt);line-height:1;
+}
+.hds-l{
+  font-family:'DM Sans',sans-serif;font-size:.62rem;font-weight:500;
+  letter-spacing:.07em;text-transform:uppercase;
+  color:rgba(247,238,216,.4);margin-top:.2rem;
+}
+ 
+/* Scroll indicator */
+.hero-scroll{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  color:rgba(247,238,216,.3);z-index:3;
+}
+.hero-scroll span{font-family:'DM Sans',sans-serif;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.scroll-line{width:1px;height:36px;background:rgba(247,238,216,.2);position:relative;overflow:hidden}
+.scroll-line::after{
+  content:'';position:absolute;top:-100%;left:0;right:0;bottom:0;
+  background:var(--ocre-lt);animation:scroll-drop 1.8s ease-in-out infinite;
+}
+@keyframes scroll-drop{0%{top:-100%}100%{top:100%}}
+ 
+/* ═══════════════════════════════
+   SECTION HELPERS
+═══════════════════════════════ */
+.wrap{max-width:1200px;margin:0 auto;padding:0 5%}
+.eyebrow{
+  font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--verm);display:block;margin-bottom:.9rem;
+}
+.eyebrow-light{color:var(--ocre-lt)}
+.s-title{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(2rem,3.5vw,3rem);
+  font-weight:400;line-height:1.12;
+  color:var(--indigo);margin-bottom:0;letter-spacing:-.02em;
+}
+.s-title em{font-style:italic;color:var(--verm)}
+.s-title-light{color:var(--papel)}
+.s-title-light em{color:var(--ocre-lt)}
+ 
+/* ═══════════════════════════════
+   SOBRE — EDITORIAL SPLIT
+═══════════════════════════════ */
+#sobre{padding:8rem 0 0;background:var(--branco)}
+.sobre-masthead{
+  background:var(--tinta);
+  padding:2.5rem 5%;
+  display:flex;align-items:center;gap:3rem;
+  flex-wrap:wrap;
+}
+.sobre-masthead-logo{
+  font-family:'Instrument Serif',serif;font-size:3.5rem;
+  color:var(--papel);font-style:italic;letter-spacing:-.03em;
+  line-height:1;
+}
+.sobre-masthead-logo span{color:var(--ocre-lt)}
+.sobre-masthead-divider{width:1px;height:60px;background:rgba(247,238,216,.2)}
+.sobre-masthead-info{flex:1}
+.sobre-masthead-info p{
+  font-family:'DM Sans',sans-serif;font-size:.82rem;
+  color:rgba(247,238,216,.55);line-height:1.6;letter-spacing:.03em;
+}
+.sobre-masthead-info strong{color:var(--ocre-lt)}
+.sobre-masthead-seal{
+  width:80px;height:80px;border-radius:50%;
+  border:2px solid rgba(247,238,216,.15);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  font-family:'DM Sans',sans-serif;text-align:center;
+}
+.sobre-masthead-seal span:first-child{font-size:.9rem;font-weight:700;color:var(--papel)}
+.sobre-masthead-seal span:last-child{font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(247,238,216,.4)}
+ 
+.sobre-body-section{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-top:1px solid var(--papel-dk);
+}
+.sobre-col{padding:4rem 5%}
+.sobre-col:first-child{border-right:1px solid var(--papel-dk)}
+ 
+.sobre-lead{
+  font-family:'Libre Baskerville',serif;
+  font-size:1.22rem;line-height:1.75;
+  color:var(--tinta);margin-bottom:1.8rem;font-weight:400;
+}
+.sobre-lead em{color:var(--verm);font-style:italic}
+.sobre-text{font-size:.95rem;line-height:1.9;color:var(--cinza)}
+.sobre-text p{margin-bottom:1rem}
+.sobre-text p:last-child{margin-bottom:0}
+.sobre-text strong{color:var(--indigo);font-weight:600}
+ 
+.coord-card-v2{
+  background:var(--indigo);padding:2rem 2.2rem;
+  margin-bottom:2rem;
+  display:grid;grid-template-columns:64px 1fr;gap:1.2rem;align-items:start;
+}
+.coord-av{
+  width:64px;height:64px;border-radius:50%;
+  object-fit:cover;object-position:top;
+  border:2px solid var(--ocre);
+  background:var(--indigo-lt);
+}
+.coord-av-placeholder{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--indigo-lt);border:2px solid var(--ocre);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--ocre-lt);
+}
+.coord-info .cn{font-family:'Libre Baskerville',serif;font-size:1rem;font-weight:700;color:var(--papel)}
+.coord-info .ct{font-family:'DM Sans',sans-serif;font-size:.78rem;color:rgba(247,238,216,.6);margin-top:.25rem;line-height:1.5}
+.coord-info .ci{font-family:'DM Sans',sans-serif;font-size:.75rem;color:var(--ocre-lt);margin-top:.4rem;font-weight:500}
+.coord-info .cc{font-family:'DM Sans',sans-serif;font-size:.75rem;color:rgba(247,238,216,.45);margin-top:.6rem}
+.coord-info .cc a{color:var(--ocre-lt);text-decoration:none}
+ 
+.eixos-list{
+  display:flex;flex-direction:column;gap:.4rem;margin-top:1.5rem;
+}
+.eixo-item{
+  font-family:'DM Sans',sans-serif;font-size:.8rem;
+  color:var(--cinza);padding:.55rem .9rem;
+  background:var(--papel);border-left:3px solid var(--ocre);
+  line-height:1.4;
+}
+ 
+.pull-quote{
+  background:var(--verm);padding:2.2rem 2.5rem;margin-bottom:2rem;
+  position:relative;
+}
+.pull-quote::before{
+  content:'\201C';
+  font-family:'Instrument Serif',serif;font-size:6rem;line-height:.5;
+  color:rgba(247,238,216,.18);position:absolute;top:1.5rem;left:1.8rem;
+}
+.pull-quote p{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:1.15rem;line-height:1.65;color:var(--papel);
+  position:relative;z-index:1;
+}
+ 
+/* ═══════════════════════════════
+   OBJETIVOS — FULL-BLEED DARK
+═══════════════════════════════ */
+#objetivos{
+  background:var(--tinta);
+  padding:7rem 0;position:relative;overflow:hidden;
+}
+.obj-texture{
+  position:absolute;inset:0;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 30h60M30 0v60' stroke='%23C8902E' stroke-width='.8'/%3E%3Ccircle cx='30' cy='30' r='12' stroke='%23C8902E' stroke-width='.5' fill='none'/%3E%3C/svg%3E");
+  background-size:60px 60px;
+}
+.obj-inner{position:relative;z-index:1}
+.obj-header{
+  display:grid;grid-template-columns:1fr 2fr;
+  gap:4rem;align-items:end;margin-bottom:4rem;
+}
+.obj-header-right p{
+  font-size:1.05rem;line-height:1.85;
+  color:rgba(247,238,216,.55);
+}
+ 
+.pilares-layout{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:1px;background:rgba(247,238,216,.07);
+}
+.pilar-v2{
+  padding:3rem 2.5rem;background:var(--tinta);
+  position:relative;overflow:hidden;
+  transition:background .3s;
+}
+.pilar-v2::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--verm);
+  transform:scaleY(0);transform-origin:bottom;
+  transition:transform .35s ease;
+}
+.pilar-v2:hover{background:#222}
+.pilar-v2:hover::before{transform:scaleY(1)}
+.pv2-icon{
+  width:48px;height:48px;margin-bottom:1.5rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.pv2-icon svg{width:100%;height:100%}
+.pv2-title{
+  font-family:'Instrument Serif',serif;font-size:1.4rem;
+  color:var(--papel);margin-bottom:.8rem;letter-spacing:-.01em;
+}
+.pv2-text{font-size:.9rem;line-height:1.85;color:rgba(247,238,216,.5)}
+.pv2-tag{
+  display:inline-block;margin-top:1.5rem;
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ocre-lt);border-top:1px solid rgba(200,144,46,.3);
+  padding-top:.6rem;
+}
+ 
+/* ═══════════════════════════════
+   NOTICIAS — EDITORIAL GRID
+═══════════════════════════════ */
+#noticias{padding:8rem 0;background:var(--branco)}
+.noticias-header{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:3.5rem;border-bottom:2px solid var(--tinta);
+  padding-bottom:1.2rem;
+}
+.noticias-header-left{}
+.link-all{
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--verm);text-decoration:none;
+  display:flex;align-items:center;gap:.4rem;
+  padding-bottom:4px;border-bottom:1px solid var(--verm);
+  transition:color .2s,border-color .2s;
+}
+.link-all:hover{color:var(--indigo);border-color:var(--indigo)}
+.link-all::after{content:'→'}
+ 
+.noticias-main-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:1px;background:var(--papel-dk);
+}
+/* Primeira notícia — destaque */
+.noticia-featured{
+  grid-column:1/3;
+  display:grid;grid-template-columns:1fr 1fr;
+  background:var(--branco);
+}
+.noticia-featured .nf-img{
+  overflow:hidden;
+}
+.noticia-featured .nf-img img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .5s ease;
+}
+.noticia-featured:hover .nf-img img{transform:scale(1.03)}
+.noticia-featured .nf-body{
+  padding:3rem 2.5rem;
+  display:flex;flex-direction:column;
+  justify-content:center;background:var(--indigo);
+}
+.noticia-featured .nf-body .nd{
+  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ocre-lt);margin-bottom:1rem;
+}
+.noticia-featured .nf-body .nt{
+  font-family:'Instrument Serif',serif;font-size:1.4rem;
+  color:var(--papel);line-height:1.3;margin-bottom:1rem;letter-spacing:-.01em;
+}
+.noticia-featured .nf-body .np{
+  font-size:.88rem;line-height:1.8;
+  color:rgba(247,238,216,.6);margin-bottom:1.5rem;
+}
+.noticia-featured .nf-body .nl{
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ocre-lt);text-decoration:none;
+  display:flex;align-items:center;gap:.4rem;
+  align-self:flex-start;
+  border-bottom:1px solid rgba(200,144,46,.4);padding-bottom:3px;
+}
+.noticia-featured .nf-body .nl::after{content:'→'}
+.noticia-featured .nf-body .nl:hover{color:var(--papel)}
+ 
+.noticia-side{
+  background:var(--branco);
+  display:flex;flex-direction:column;
+  cursor:default;transition:background .2s;
+}
+.noticia-side:hover{background:var(--papel)}
+.ns-img{overflow:hidden;aspect-ratio:16/9}
+.ns-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.noticia-side:hover .ns-img img{transform:scale(1.04)}
+.ns-body{padding:1.6rem 1.8rem 2rem;flex:1;display:flex;flex-direction:column}
+.ns-date{
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--verm);margin-bottom:.7rem;
+}
+.ns-title{
+  font-family:'Instrument Serif',serif;font-size:1.1rem;
+  color:var(--indigo);line-height:1.35;letter-spacing:-.01em;
+  margin-bottom:.6rem;flex:1;
+}
+.ns-link{
+  font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;
+  color:var(--verm);text-decoration:none;margin-top:auto;
+  display:inline-block;
+}
+.ns-link:hover{color:var(--indigo)}
+ 
+/* Row 2 notícias */
+.noticia-mini{
+  background:var(--branco);padding:1.8rem 2rem;
+  display:flex;flex-direction:column;gap:.5rem;
+  border-top:1px solid var(--papel-dk);
+  cursor:default;transition:background .2s;
+}
+.noticia-mini:hover{background:var(--papel)}
+.nm-date{
+  font-family:'DM Sans',sans-serif;font-size:.65rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--verm);
+}
+.nm-title{
+  font-family:'Instrument Serif',serif;font-size:1rem;
+  color:var(--indigo);line-height:1.35;letter-spacing:-.01em;
+}
+.nm-link{
+  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--verm);
+  text-decoration:none;margin-top:.5rem;
+}
+ 
+/* ═══════════════════════════════
+   GALERIA — IMMERSIVE MOSAIC
+═══════════════════════════════ */
+#galeria{background:var(--tinta);padding:7rem 0}
+.gal-header{margin-bottom:2.5rem}
+.gal-header .eyebrow-light{}
+ 
+.mosaic{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  grid-template-rows:280px 280px;
+  gap:3px;
+}
+.mosaic-item{
+  position:relative;overflow:hidden;
+  background:#252525;cursor:pointer;
+}
+.mosaic-item:nth-child(1){grid-row:1/3}
+.mosaic-item img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .5s ease,filter .4s;
+  filter:grayscale(25%);
+}
+.mosaic-item:hover img{transform:scale(1.06);filter:grayscale(0%)}
+.mosaic-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(28,53,87,.85) 0%,transparent 50%);
+  display:flex;align-items:flex-end;padding:1.2rem 1.4rem;
+  opacity:0;transition:opacity .35s;
+}
+.mosaic-item:hover .mosaic-overlay{opacity:1}
+.mosaic-caption{
+  font-family:'DM Sans',sans-serif;font-size:.78rem;
+  font-style:italic;color:var(--papel);
+}
+.mosaic-placeholder{
+  width:100%;height:100%;
+  background:linear-gradient(135deg,#242424,#2e2e2e);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;
+}
+.mosaic-placeholder .mp-icon{font-size:2rem;opacity:.2}
+.mosaic-placeholder .mp-label{
+  font-family:'DM Sans',sans-serif;font-size:.65rem;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(247,238,216,.2);
+}
+ 
+.gal-cta{
+  margin-top:2rem;text-align:center;
+}
+.gal-cta a{
+  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(247,238,216,.45);text-decoration:none;
+  border-bottom:1px solid rgba(247,238,216,.2);padding-bottom:3px;
+  transition:color .2s,border-color .2s;
+}
+.gal-cta a:hover{color:var(--ocre-lt);border-color:var(--ocre-lt)}
+ 
+/* ═══════════════════════════════
+   ACERVO — CARDS GRID
+═══════════════════════════════ */
+#acervo{padding:8rem 0;background:var(--papel)}
+.acervo-intro{
+  display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:end;margin-bottom:4rem;
+}
+.acervo-intro-text{
+  font-size:.97rem;line-height:1.9;color:var(--cinza);
+}
+.acervo-intro-text p{margin-bottom:1rem}
+.acervo-intro-text strong{color:var(--indigo)}
+ 
+.acervo-cats{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--papel-dk);
+}
+.acervo-cat{
+  background:var(--branco);padding:1.4rem 1.6rem;
+  display:flex;flex-direction:column;gap:.4rem;
+  cursor:pointer;transition:background .2s,border-color .2s;
+  border-left:3px solid transparent;
+}
+.acervo-cat:hover,.acervo-cat.active{
+  background:var(--indigo);border-color:var(--verm);
+}
+.acervo-cat:hover .ac-name,.acervo-cat.active .ac-name{color:var(--papel)}
+.acervo-cat:hover .ac-count,.acervo-cat.active .ac-count{color:var(--ocre-lt)}
+.ac-icon{font-size:1.3rem;margin-bottom:.2rem}
+.ac-name{
+  font-family:'Instrument Serif',serif;font-size:1rem;
+  color:var(--indigo);transition:color .2s;
+}
+.ac-count{
+  font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;
+  color:var(--cinza-lt);transition:color .2s;
+}
+ 
+.pub-section{margin-top:4rem;padding-top:3rem;border-top:2px solid var(--papel-dk)}
+.pub-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;background:var(--papel-dk);margin-top:2rem}
+.pub-card-v2{
+  background:var(--branco);padding:2rem;
+  display:flex;flex-direction:column;gap:1rem;
+  transition:background .2s;
+}
+.pub-card-v2:hover{background:var(--tinta)}
+.pub-card-v2:hover .pcv-title{color:var(--papel)}
+.pub-card-v2:hover .pcv-meta{color:rgba(247,238,216,.5)}
+.pub-card-v2:hover .pcv-links a{color:var(--ocre-lt)}
+.pcv-year{
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--verm);
+}
+.pcv-title{
+  font-family:'Instrument Serif',serif;font-size:1.05rem;
+  color:var(--indigo);line-height:1.4;letter-spacing:-.01em;
+  transition:color .2s;
+}
+.pcv-meta{
+  font-family:'DM Sans',sans-serif;font-size:.78rem;
+  color:var(--cinza-lt);line-height:1.5;transition:color .2s;
+}
+.pcv-links{display:flex;gap:1rem}
+.pcv-links a{
+  font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--verm);text-decoration:none;transition:color .2s;
+}
+ 
+/* ═══════════════════════════════
+   PARCEIROS — INTERSETORIAL
+═══════════════════════════════ */
+#parceiros{background:var(--indigo);padding:6rem 0}
+.parceiros-inner{
+  display:grid;grid-template-columns:1fr 2fr;gap:5rem;align-items:start;
+}
+.parceiros-left .eyebrow{color:var(--ocre-lt)}
+.parceiros-intro{
+  font-size:.95rem;line-height:1.85;
+  color:rgba(247,238,216,.55);margin-top:1rem;
+}
+ 
+.parceiros-grid{
+  display:flex;flex-wrap:wrap;gap:2px;
+}
+.parc-tag{
+  font-family:'DM Sans',sans-serif;font-size:.78rem;
+  color:rgba(247,238,216,.7);
+  background:rgba(247,238,216,.06);
+  border:1px solid rgba(247,238,216,.1);
+  padding:.45rem .9rem;
+  transition:background .2s,color .2s,border-color .2s;
+  cursor:default;
+}
+.parc-tag:hover{
+  background:var(--verm);color:var(--papel);
+  border-color:var(--verm);
+}
+ 
+/* ═══════════════════════════════
+   EQUIPE
+═══════════════════════════════ */
+#equipe{padding:8rem 0;background:var(--branco)}
+.equipe-layout{
+  display:grid;grid-template-columns:360px 1fr;gap:5rem;align-items:start;margin-top:3.5rem;
+}
+.coord-featured{background:var(--indigo);padding:2.5rem;position:relative}
+.coord-featured::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--verm);
+}
+.cf-photo{
+  width:100%;aspect-ratio:1;object-fit:cover;object-position:top center;
+  margin-bottom:1.5rem;filter:grayscale(10%);
+  background:var(--indigo-lt);
+}
+.cf-name{font-family:'Instrument Serif',serif;font-size:1.45rem;color:var(--papel);line-height:1.15}
+.cf-role{
+  font-family:'DM Sans',sans-serif;font-size:.8rem;
+  color:rgba(247,238,216,.55);margin-top:.4rem;line-height:1.5;
+}
+.cf-badge{
+  display:inline-block;margin-top:.8rem;
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ocre-lt);background:rgba(200,144,46,.12);
+  padding:.25rem .7rem;border:1px solid rgba(200,144,46,.25);
+}
+.cf-contact{margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid rgba(247,238,216,.12)}
+.cf-contact a{
+  display:block;font-family:'DM Sans',sans-serif;font-size:.78rem;
+  color:rgba(247,238,216,.5);text-decoration:none;margin-bottom:.4rem;
+  transition:color .2s;
+}
+.cf-contact a:hover{color:var(--ocre-lt)}
+ 
+.bolsistas-section{}
+.bol-title{
+  font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--cinza-lt);
+  margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:1px solid var(--papel-dk);
+}
+.bol-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--papel-dk);
+}
+.bol-card{
+  background:var(--branco);padding:1.2rem 1.4rem;
+  display:flex;align-items:center;gap:.8rem;
+  transition:background .2s;
+}
+.bol-card:hover{background:var(--papel)}
+.bol-av{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--indigo);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:700;
+  color:var(--ocre-lt);
+}
+.bol-name{font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;color:var(--indigo)}
+.bol-role{font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--cinza-lt)}
+ 
+/* ═══════════════════════════════
+   CONTATO
+═══════════════════════════════ */
+#contato{
+  background:var(--tinta);padding:8rem 0;
+  position:relative;overflow:hidden;
+}
+#contato::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--verm),var(--ocre),var(--indigo-lt));
+}
+.contato-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:6rem;
+}
+.contato-left .eyebrow-light{}
+.contato-tagline{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:1.3rem;color:rgba(247,238,216,.45);
+  margin-top:1rem;line-height:1.5;
+}
+.c-info-list{margin-top:2.5rem;display:flex;flex-direction:column;gap:1.4rem}
+.c-info-item{display:flex;gap:1rem;align-items:flex-start}
+.c-icon{
+  width:38px;height:38px;min-width:38px;
+  background:rgba(247,238,216,.05);border:1px solid rgba(247,238,216,.1);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+}
+.c-label{
+  font-family:'DM Sans',sans-serif;font-size:.67rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ocre-lt);margin-bottom:.25rem;
+}
+.c-value{font-size:.9rem;color:rgba(247,238,216,.7);line-height:1.5}
+.c-value a{color:var(--ocre-lt);text-decoration:none}
+.c-value a:hover{text-decoration:underline}
+ 
+/* Hospedagem info box */
+.hospedagem-box{
+  margin-top:2.5rem;
+  background:rgba(247,238,216,.04);
+  border:1px solid rgba(247,238,216,.08);
+  padding:1.5rem 1.8rem;
+}
+.hb-title{
+  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ocre-lt);
+  margin-bottom:1rem;
+}
+.hb-items{display:flex;flex-direction:column;gap:.5rem}
+.hb-item{
+  display:flex;align-items:center;gap:.6rem;
+  font-family:'DM Sans',sans-serif;font-size:.82rem;color:rgba(247,238,216,.55);
+}
+.hb-item::before{content:'✓';color:var(--ocre-lt);flex-shrink:0}
+ 
+.form-v2{display:flex;flex-direction:column;gap:1rem}
+.fg{display:flex;flex-direction:column;gap:.35rem}
+.fl{
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(247,238,216,.35);
+}
+.fi,.ft{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(247,238,216,.12);
+  color:var(--papel);
+  padding:.8rem 1rem;
+  font-family:'DM Sans',sans-serif;font-size:.92rem;
+  outline:none;-webkit-appearance:none;
+  transition:border-color .2s,background .2s;
+}
+.fi:focus,.ft:focus{
+  border-color:var(--ocre);background:rgba(255,255,255,.07);
+}
+.fi::placeholder,.ft::placeholder{color:rgba(247,238,216,.2)}
+.ft{resize:vertical;min-height:120px}
+.fs{
+  font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:.9rem 2rem;background:var(--verm);color:var(--papel);
+  border:none;cursor:pointer;align-self:flex-start;
+  transition:background .2s;
+}
+.fs:hover{background:var(--verm-lt)}
+ 
+/* ═══════════════════════════════
+   FOOTER
+═══════════════════════════════ */
+footer{
+  background:#0D0D0D;
+  padding:3rem 5%;
+}
+.footer-inner{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:3rem;
+  padding-bottom:2.5rem;border-bottom:1px solid rgba(247,238,216,.08);
+}
+.footer-brand{}
+.footer-logo{
+  font-family:'Instrument Serif',serif;font-size:1.8rem;
+  color:var(--papel);font-style:italic;letter-spacing:-.02em;
+}
+.footer-logo span{color:var(--ocre-lt)}
+.footer-tagline{
+  font-family:'DM Sans',sans-serif;font-size:.78rem;
+  color:rgba(247,238,216,.3);margin-top:.5rem;line-height:1.6;
+}
+.footer-col-title{
+  font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(247,238,216,.3);
+  margin-bottom:1rem;
+}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.footer-links a{
+  font-family:'DM Sans',sans-serif;font-size:.82rem;
+  color:rgba(247,238,216,.45);text-decoration:none;transition:color .2s;
+}
+.footer-links a:hover{color:var(--ocre-lt)}
+.footer-bottom{
+  max-width:1200px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:1.5rem;flex-wrap:wrap;gap:1rem;
+}
+.footer-copy{font-family:'DM Sans',sans-serif;font-size:.72rem;color:rgba(247,238,216,.2)}
+.footer-credit{font-family:'DM Sans',sans-serif;font-size:.72rem;color:rgba(247,238,216,.2)}
+.footer-credit a{color:var(--verm);text-decoration:none}
+ 
+/* ═══════════════════════════════
+   REVEAL ANIMATIONS
+═══════════════════════════════ */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.rv.on{opacity:1;transform:none}
+.rv-d1{opacity:0;transform:translateY(28px);transition:opacity .7s .12s ease,transform .7s .12s ease}
+.rv-d1.on{opacity:1;transform:none}
+.rv-d2{opacity:0;transform:translateY(28px);transition:opacity .7s .24s ease,transform .7s .24s ease}
+.rv-d2.on{opacity:1;transform:none}
+.rv-left{opacity:0;transform:translateX(-24px);transition:opacity .7s ease,transform .7s ease}
+.rv-left.on{opacity:1;transform:none}
+.rv-right{opacity:0;transform:translateX(24px);transition:opacity .7s ease,transform .7s ease}
+.rv-right.on{opacity:1;transform:none}
+ 
+/* ═══════════════════════════════
+   RESPONSIVE
+═══════════════════════════════ */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:3rem;padding-top:8rem}
+  .hero-photo-card{max-width:320px}
+  .hero-data-strip{max-width:320px}
+  .sobre-body-section{grid-template-columns:1fr}
+  .sobre-col:first-child{border-right:none;border-bottom:1px solid var(--papel-dk)}
+  .pilares-layout{grid-template-columns:1fr}
+  .noticias-main-grid{grid-template-columns:1fr}
+  .noticia-featured{grid-column:auto;grid-template-columns:1fr}
+  .noticia-featured .nf-img{aspect-ratio:16/9}
+  .mosaic{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .mosaic-item:nth-child(1){grid-row:auto}
+  .acervo-intro{grid-template-columns:1fr}
+  .pub-grid{grid-template-columns:1fr}
+  .parceiros-inner{grid-template-columns:1fr}
+  .equipe-layout{grid-template-columns:1fr}
+  .coord-featured{max-width:360px}
+  .bol-grid{grid-template-columns:1fr}
+  .contato-inner{grid-template-columns:1fr;gap:4rem}
+  .footer-inner{grid-template-columns:1fr}
+  .obj-header{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .nav-links,.nav-cta{display:none}
+  .hamburger{display:flex}
+  #sobre,#objetivos,#noticias,#galeria,#acervo,#parceiros,#equipe,#contato{padding:5rem 0}
+  .hero-h1{font-size:2.8rem}
+  .hero-right{display:none}
+  .acervo-cats{grid-template-columns:1fr}
+  .noticias-main-grid{gap:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .rv,.rv-d1,.rv-d2,.rv-left,.rv-right{opacity:1;transform:none;transition:none}
+  html{scroll-behavior:auto}
+  .scroll-line::after,.xilo-cell{animation:none}
+}
+</style>
+</head>
+<body>
+ 
+<!-- ── NAV ── -->
+<nav id="nav">
+  <a class="nav-logo" href="#">
+    Lab<span class="nav-logo-accent">Sul</span>
+    <span class="nav-logo-sub">UECE · Quixadá</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#noticias">Notícias</a></li>
+    <li><a href="#galeria">Galeria</a></li>
+    <li><a href="#acervo">Acervo</a></li>
+    <li><a href="#parceiros">Parcerias</a></li>
+    <li><a href="#equipe">Equipe</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+  <a class="nav-cta" href="#contato">Colabore</a>
+  <button class="hamburger" onclick="toggleMobile()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+ 
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#sobre" onclick="toggleMobile()">Sobre</a>
+  <a href="#noticias" onclick="toggleMobile()">Notícias</a>
+  <a href="#galeria" onclick="toggleMobile()">Galeria</a>
+  <a href="#acervo" onclick="toggleMobile()">Acervo</a>
+  <a href="#parceiros" onclick="toggleMobile()">Parcerias</a>
+  <a href="#equipe" onclick="toggleMobile()">Equipe</a>
+  <a href="#contato" onclick="toggleMobile()">Contato</a>
+</div>
+ 
+<!-- ── HERO ── -->
+<section id="hero">
+  <!-- Xilogravura — woodcut motifs native to cordel culture -->
+  <div class="xilo-bg" aria-hidden="true" id="xiloBg"></div>
+  <div class="hero-bg-text" aria-hidden="true">Cordel</div>
+ 
+  <div class="hero-inner wrap">
+    <div class="hero-left">
+      <div class="hero-kicker rv">Projeto de Extensão · UECE / FECLESC · Quixadá — CE</div>
+      <h1 class="hero-h1 rv">
+        <span class="line-italic">LabSul</span>
+        <span>Cultura Popular</span>
+        <span class="line-sm">Nordestina &amp; Ibérica</span>
+      </h1>
+      <div class="hero-rule rv-d1"></div>
+      <p class="hero-desc rv-d1">
+        Laboratório de Formação em Cultura Popular Nordestina e Ibérica —
+        pesquisa, mapeia e difunde a literatura de cordel, a cantoria e 
+        as tradições do Sertão Central do Ceará.
+      </p>
+      <div class="hero-actions rv-d2">
+        <a class="btn-verm" href="#noticias">Ver Atividades</a>
+        <a class="btn-wire" href="https://www.instagram.com/lab_sul/" target="_blank" rel="noopener">@lab_sul</a>
+      </div>
+    </div>
+ 
+    <div class="hero-right rv-right">
+      <div class="hero-photo-card">
+        <img
+          src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/Rodrigo-de-Albuquerque-Coordenador-de-Projeto-LABSUL-2-150x150.jpg"
+          alt="Prof. Dr. Rodrigo de Albuquerque Marques — Coordenador do LabSul"
+          onerror="this.parentNode.style.minHeight='320px'"
+        >
+        <div class="hero-photo-overlay">
+          <div>
+            <div class="hpo-name">Prof. Dr. Rodrigo de Albuquerque Marques</div>
+            <div class="hpo-role">Coordenador · Doutor em Letras · FECLESC/UECE</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-data-strip">
+        <div class="hds-item">
+          <div class="hds-n">11</div>
+          <div class="hds-l">Bolsistas</div>
+        </div>
+        <div class="hds-item">
+          <div class="hds-n">15+</div>
+          <div class="hds-l">Parceiros</div>
+        </div>
+        <div class="hds-item">
+          <div class="hds-n">4</div>
+          <div class="hds-l">Eixos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="hero-scroll">
+    <span>Rolar</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+ 
+<!-- ── SOBRE ── -->
+<section id="sobre">
+  <div class="sobre-masthead rv">
+    <div class="sobre-masthead-logo">Lab<span>Sul</span></div>
+    <div class="sobre-masthead-divider"></div>
+    <div class="sobre-masthead-info">
+      <p>
+        <strong>Laboratório de Formação em Cultura Popular Nordestina e Ibérica</strong><br>
+        Universidade Estadual do Ceará · Faculdade de Educação, Ciências e Letras do Sertão Central<br>
+        Rede INTERSET-CE · Ministério da Educação
+      </p>
+    </div>
+    <div class="sobre-masthead-seal">
+      <span>UECE</span>
+      <span>Extensão</span>
+    </div>
+  </div>
+ 
+  <div class="sobre-body-section">
+    <div class="sobre-col rv-left">
+      <div class="coord-card-v2">
+        <img
+          class="coord-av"
+          src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/Rodrigo-de-Albuquerque-Coordenador-de-Projeto-LABSUL-2-150x150.jpg"
+          alt="Prof. Dr. Rodrigo de Albuquerque Marques"
+          onerror="this.style.display='none'"
+        >
+        <div class="coord-info">
+          <div class="cn">Prof. Dr. Rodrigo de Albuquerque Marques</div>
+          <div class="ct">Doutor em Letras · Professor da FECLESC/UECE</div>
+          <div class="ci">Coordenador do LabSul</div>
+          <div class="cc">
+            <a href="mailto:rodrigo.marques@uece.br">rodrigo.marques@uece.br</a><br>
+            <a href="tel:+5588999561200">(88) 99956-1200</a>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="pull-quote rv-d1">
+        <p>A cultura popular não é um museu — é um organismo vivo que respira entre o canto, o passo e a palavra.</p>
+      </div>
+ 
+      <div class="eixos-list rv-d2">
+        <span class="eyebrow" style="margin-bottom:0">Eixos temáticos</span>
+        <div class="eixo-item">Eixo 2 · Valorização do Patrimônio Cultural, Histórico e Natural</div>
+        <div class="eixo-item">Eixo 11 · Equipamentos Intersetoriais</div>
+        <div class="eixo-item">Eixo 13 · Educação de Jovens e Adultos (EJA)</div>
+        <div class="eixo-item">Eixo 14 · Políticas de Educação Integral</div>
+      </div>
+    </div>
+ 
+    <div class="sobre-col rv-right">
+      <p class="sobre-lead">
+        O <em>LabSul</em> é um laboratório de extensão da Universidade Estadual do Ceará, campus FECLESC em Quixadá, dedicado a mapear, analisar e promover a cultura popular do Sertão Central do Ceará e suas raízes ibéricas.
+      </p>
+      <div class="sobre-text">
+        <p>
+          Coordenado pelo Prof. Dr. Rodrigo de Albuquerque Marques, o laboratório realiza mapeamento cultural com levantamento socioeconômico em parceria com a UNICAMP, constitui banco de dados online para divulgação e uso pedagógico, e destaca especialmente a <strong>autoria feminina na literatura de cordel</strong>.
+        </p>
+        <p>
+          O LabSul publica cordéis pelo <strong>Selo LabSul da EDUECE</strong> em coedição com a Editora Aluá, distribui <strong>cordeltecas</strong> em escolas públicas de Quixadá e Quixeramobim (expositor com 100 folhetos cada), e coordena grupos de estudos internacionais com pesquisadores do Brasil, Chile, Cuba e Itália.
+        </p>
+        <p>
+          As ações incluem oficinas de escrita de cordel, gravura e editoração, saraus literários, cantoria de viola, apoio a festivais da cultura popular e participação em simpósios acadêmicos nacionais e internacionais.
+        </p>
+        <p>
+          O objetivo final é fortalecer territórios criativos no Sertão Central cearense, conectando poetas ao mercado editorial, incentivando o empreendedorismo cultural e garantindo que a tradição oral sobreviva — <strong>não como relíquia, mas como presente vivo</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── OBJETIVOS ── -->
+<section id="objetivos">
+  <div class="obj-texture"></div>
+  <div class="obj-inner wrap">
+    <div class="obj-header">
+      <div>
+        <span class="eyebrow eyebrow-light rv">Missão</span>
+        <h2 class="s-title s-title-light rv">O que o<br><em>LabSul</em> faz</h2>
+      </div>
+      <div class="obj-header-right rv-d1">
+        <p>
+          Três frentes que se alimentam mutuamente: pesquisa que vira publicação, publicação que chega às escolas, 
+          escola que retorna à universidade com novos poetas, novas vozes e nova memória coletiva registrada.
+        </p>
+      </div>
+    </div>
+ 
+    <div class="pilares-layout">
+      <div class="pilar-v2 rv">
+        <div class="pv2-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="20" stroke="#C0321E" stroke-width="1.5"/>
+            <path d="M16 24h16M24 16v16" stroke="#A8722A" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="pv2-title">Mapear e Pesquisar</div>
+        <p class="pv2-text">
+          Levantamento sistemático de poetas, cordelistas e manifestações culturais do Sertão Central, com análise comparada com a tradição ibérica. Banco de dados online acessível para pesquisa e uso pedagógico, com parceria técnica da UNICAMP.
+        </p>
+        <span class="pv2-tag">Literatura · Oralidade · Campo</span>
+      </div>
+ 
+      <div class="pilar-v2 rv-d1">
+        <div class="pv2-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="10" width="32" height="28" rx="1" stroke="#C0321E" stroke-width="1.5"/>
+            <path d="M16 18h16M16 24h10M16 30h12" stroke="#A8722A" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="pv2-title">Publicar e Difundir</div>
+        <p class="pv2-text">
+          Publicação de cordéis pelo Selo LabSul da EDUECE em coedição com a Editora Aluá. Distribuição de cordeltecas com 100 folhetos em 10 escolas de Quixadá e Quixeramobim. Participação em simpósios, festivais e eventos culturais.
+        </p>
+        <span class="pv2-tag">Cordel · Editora · Escolas</span>
+      </div>
+ 
+      <div class="pilar-v2 rv-d2">
+        <div class="pv2-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="16" r="8" stroke="#C0321E" stroke-width="1.5"/>
+            <path d="M8 40c0-8.837 7.163-16 16-16s16 7.163 16 16" stroke="#A8722A" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="pv2-title">Formar e Estender</div>
+        <p class="pv2-text">
+          11 bolsistas universitários em pesquisa de campo real. Oficinas de escrita de cordel, gravura e editoração. Grupos de estudos internacionais com Brasil, Chile, Cuba e Itália. A extensão que sai dos muros e volta transformada.
+        </p>
+        <span class="pv2-tag">Bolsistas · Oficinas · Internacional</span>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── NOTÍCIAS / ATIVIDADES ── -->
+<section id="noticias">
+  <div class="wrap">
+    <div class="noticias-header">
+      <div>
+        <span class="eyebrow rv">Notícias &amp; Atividades</span>
+        <h2 class="s-title rv">O que o LabSul <em>tem feito</em></h2>
+      </div>
+      <a class="link-all rv" href="https://redeintersetce.ufc.br/projeto/laboratorio-de-formacao-em-cultura-popular-nordestina-e-iberica-labsul/" target="_blank" rel="noopener">Todas as notícias</a>
+    </div>
+ 
+    <div class="noticias-main-grid rv">
+      <!-- Destaque -->
+      <div class="noticia-featured">
+        <div class="nf-img">
+          <img
+            src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/WhatsApp-Image-2026-02-20-at-18.44.31-2.jpeg"
+            alt="Cordeltecas entregues em Quixeramobim"
+            loading="lazy"
+          >
+        </div>
+        <div class="nf-body">
+          <div class="nd">Fevereiro 2026</div>
+          <h3 class="nt">LabSul entrega cordeltecas em mais cinco escolas de Quixeramobim</h3>
+          <p class="np">Em parceria com a Editora Aluá, o LabSul chegou a Quixeramobim com cinco novos expositores — cada um com cem folhetos, incluindo os cordéis publicados pelo Selo LabSul da EDUECE. A recepção nas escolas foi calorosa.</p>
+          <a class="nl" href="https://redeintersetce.ufc.br/projeto/laboratorio-de-formacao-em-cultura-popular-nordestina-e-iberica-labsul/" target="_blank">Leia completo</a>
+        </div>
+      </div>
+ 
+      <!-- Lateral -->
+      <div class="noticia-side">
+        <div class="ns-img">
+          <img
+            src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/WhatsApp-Image-2025-08-28-at-18.26.11.jpeg"
+            alt="Grupo de estudos internacional"
+            loading="lazy"
+          >
+        </div>
+        <div class="ns-body">
+          <div class="ns-date">Agosto 2025</div>
+          <h3 class="ns-title">LabSul coordena grupo de estudos com Brasil, Chile e Cuba</h3>
+          <a class="ns-link" href="https://redeintersetce.ufc.br/projeto/laboratorio-de-formacao-em-cultura-popular-nordestina-e-iberica-labsul/" target="_blank">Leia mais</a>
+        </div>
+      </div>
+ 
+      <!-- Mini cards row 2 -->
+      <div class="noticia-mini">
+        <div class="nm-date">Set–Out 2025</div>
+        <h3 class="nm-title">Lançamento de cordéis no Teatro Maria Clotilde — Banabuiú</h3>
+        <a class="nm-link" href="https://redeintersetce.ufc.br/projeto/laboratorio-de-formacao-em-cultura-popular-nordestina-e-iberica-labsul/" target="_blank">Leia</a>
+      </div>
+ 
+      <div class="noticia-mini">
+        <div class="nm-date">Out 2025</div>
+        <h3 class="nm-title">Oficina de cordel com Rouxinol do Rinaré na FECLESC</h3>
+        <a class="nm-link" href="https://redeintersetce.ufc.br/projeto/laboratorio-de-formacao-em-cultura-popular-nordestina-e-iberica-labsul/" target="_blank">Leia</a>
+      </div>
+ 
+      <div class="noticia-mini">
+        <div class="nm-date">Nov–Dez 2025</div>
+        <h3 class="nm-title">Oficina de gravura e editoração com Silva Barros e Diego San</h3>
+        <a class="nm-link" href="https://redeintersetce.ufc.br/projeto/laboratorio-de-formacao-em-cultura-popular-nordestina-e-iberica-labsul/" target="_blank">Leia</a>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── GALERIA ── -->
+<section id="galeria">
+  <div class="wrap">
+    <div class="gal-header">
+      <span class="eyebrow eyebrow-light rv">Galeria de Fotos</span>
+      <h2 class="s-title s-title-light rv">O campo em <em>imagens</em></h2>
+    </div>
+    <div class="mosaic rv">
+      <div class="mosaic-item">
+        <img src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/WhatsApp-Image-2025-09-30-at-12.25.10-scaled.jpeg" alt="Lançamento Banabuiú 2025" loading="lazy">
+        <div class="mosaic-overlay"><span class="mosaic-caption">Lançamento de Cordéis — Teatro Cotinha, Banabuiú</span></div>
+      </div>
+      <div class="mosaic-item">
+        <img src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/WhatsApp-Image-2025-11-05-at-10.16.43.jpeg" alt="II Mostra Cordel" loading="lazy">
+        <div class="mosaic-overlay"><span class="mosaic-caption">II Mostra Cordel Repente e Cantoria</span></div>
+      </div>
+      <div class="mosaic-item">
+        <img src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/WhatsApp-Image-2025-09-17-at-12.36.51.jpeg" alt="Sarau FECLESC" loading="lazy">
+        <div class="mosaic-overlay"><span class="mosaic-caption">Sarau Literário na FECLESC — Set. 2025</span></div>
+      </div>
+      <div class="mosaic-item">
+        <img src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/IMG_9600-1-scaled.jpg" alt="Atividade de campo" loading="lazy">
+        <div class="mosaic-overlay"><span class="mosaic-caption">Pesquisa de campo — Sertão Central</span></div>
+      </div>
+      <div class="mosaic-item">
+        <img src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/WhatsApp-Image-2025-11-05-at-09.42.10.jpeg" alt="Oficina de cordel" loading="lazy">
+        <div class="mosaic-overlay"><span class="mosaic-caption">Oficina de Escrita de Cordel — FECLESC</span></div>
+      </div>
+    </div>
+    <div class="gal-cta rv-d1">
+      <a href="https://www.instagram.com/lab_sul/" target="_blank">Ver mais no Instagram @lab_sul →</a>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── ACERVO ── -->
+<section id="acervo">
+  <div class="wrap">
+    <span class="eyebrow rv">Acervo, Biblioteca &amp; Publicações</span>
+    <h2 class="s-title rv">O que o LabSul <em>guarda e publica</em></h2>
+ 
+    <div class="acervo-intro rv-d1">
+      <div class="acervo-intro-text">
+        <p>
+          O LabSul constitui um acervo digital e físico de manifestações culturais populares do Sertão Central do Ceará. 
+          Gravações de campo, fotografias, transcrições de repentes, folhetos de cordel e registros de festas 
+          são organizados em um <strong>banco de dados acessível para pesquisa e uso pedagógico</strong>.
+        </p>
+        <p>
+          As publicações do laboratório são editadas pela <strong>EDUECE sob o Selo LabSul</strong>, 
+          em coedição com a Editora Aluá — distribuídas gratuitamente em eventos e escolas parceiras 
+          do projeto Caminhos do Cordel.
+        </p>
+      </div>
+      <div class="acervo-cats">
+        <div class="acervo-cat active" onclick="setActiveCat(this)">
+          <span class="ac-icon">📼</span>
+          <span class="ac-name">Gravações audiovisuais</span>
+          <span class="ac-count">87+ registros</span>
+        </div>
+        <div class="acervo-cat" onclick="setActiveCat(this)">
+          <span class="ac-icon">📖</span>
+          <span class="ac-name">Literatura de cordel</span>
+          <span class="ac-count">140+ folhetos</span>
+        </div>
+        <div class="acervo-cat" onclick="setActiveCat(this)">
+          <span class="ac-icon">📸</span>
+          <span class="ac-name">Fotografia de campo</span>
+          <span class="ac-count">300+ imagens</span>
+        </div>
+        <div class="acervo-cat" onclick="setActiveCat(this)">
+          <span class="ac-icon">🎵</span>
+          <span class="ac-name">Gravações musicais</span>
+          <span class="ac-count">Cantoria · Repente</span>
+        </div>
+        <div class="acervo-cat" onclick="setActiveCat(this)">
+          <span class="ac-icon">🗺️</span>
+          <span class="ac-name">Mapeamento cultural</span>
+          <span class="ac-count">Sertão Central</span>
+        </div>
+        <div class="acervo-cat" onclick="setActiveCat(this)">
+          <span class="ac-icon">📄</span>
+          <span class="ac-name">Transcrições &amp; textos</span>
+          <span class="ac-count">Pesquisas · Artigos</span>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="pub-section">
+      <span class="eyebrow">Publicações</span>
+      <div class="pub-grid rv">
+        <div class="pub-card-v2">
+          <div class="pcv-year">2025</div>
+          <div class="pcv-title">Informativo GETETE, n.1, v.2</div>
+          <div class="pcv-meta">ISSN 3085-5926 · UNICAMP/GETETE em parceria com o LabSul</div>
+          <div class="pcv-links">
+            <a href="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/Getete-2025-v3.pdf" target="_blank">📂 Download</a>
+            <a href="https://pesquisa.ie.unicamp.br/centros-e-nucleos/cede/getete/informativo-getete/" target="_blank">🔗 Ver online</a>
+          </div>
+        </div>
+        <div class="pub-card-v2">
+          <div class="pcv-year">2025</div>
+          <div class="pcv-title">Informativo GETETE, n.2, v.2</div>
+          <div class="pcv-meta">ISSN 3085-5926 · Novembro 2025 · UNICAMP/GETETE</div>
+          <div class="pcv-links">
+            <a href="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/Informativo-GETETE-2025-n2-3.pdf" target="_blank">📂 Download</a>
+            <a href="https://pesquisa.ie.unicamp.br/centros-e-nucleos/cede/getete/informativo-getete/edicoes-anteriores/" target="_blank">🔗 Ver online</a>
+          </div>
+        </div>
+        <div class="pub-card-v2">
+          <div class="pcv-year">2025</div>
+          <div class="pcv-title">Cordéis do Sertão — Coleção Caminhos do Cordel</div>
+          <div class="pcv-meta">Selo LabSul / EDUECE · Coedição Editora Aluá · Edital Arte da Palavra / PNAB</div>
+          <div class="pcv-links">
+            <a href="https://www.instagram.com/lab_sul/" target="_blank">🔗 Instagram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── PARCEIROS ── -->
+<section id="parceiros">
+  <div class="wrap">
+    <div class="parceiros-inner">
+      <div>
+        <span class="eyebrow eyebrow-light rv">Parcerias Intersetoriais</span>
+        <h2 class="s-title s-title-light rv">Quem faz o LabSul <em>acontecer</em></h2>
+        <p class="parceiros-intro rv-d1">
+          Universidade, escolas públicas, editoras, associações culturais e pesquisadores internacionais — 
+          o LabSul funciona porque é uma rede, não uma ilha.
+        </p>
+      </div>
+      <div class="parceiros-grid rv-right">
+        <span class="parc-tag">Editora Aluá</span>
+        <span class="parc-tag">EDUECE · Selo LabSul</span>
+        <span class="parc-tag">UNICAMP / GETETE</span>
+        <span class="parc-tag">CREDE 12</span>
+        <span class="parc-tag">Casa de Saberes Cego Aderaldo</span>
+        <span class="parc-tag">Fundação Cultural Rachel de Queiroz</span>
+        <span class="parc-tag">SESC Quixeramobim</span>
+        <span class="parc-tag">Universidad de Matanzas (Cuba)</span>
+        <span class="parc-tag">Leitorado Guimarães Rosa (Chile)</span>
+        <span class="parc-tag">EEM Martins Rodrigues — Quixadá</span>
+        <span class="parc-tag">EEM Gonzaga Mota — Quixadá</span>
+        <span class="parc-tag">EEM Abraão Baquit — Quixadá</span>
+        <span class="parc-tag">EEM Gov. César Cals — Quixadá</span>
+        <span class="parc-tag">CEJA João Ricardo da Silveira — Quixadá</span>
+        <span class="parc-tag">E. Agrícola Deputado Leorne Belém — Quixeramobim</span>
+        <span class="parc-tag">Col. Humberto Bezerra — Quixeramobim</span>
+        <span class="parc-tag">E. Prof. Marum Simão — Quixeramobim</span>
+        <span class="parc-tag">E. Irmã Tereza Cristina — Quixeramobim</span>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── EQUIPE ── -->
+<section id="equipe">
+  <div class="wrap">
+    <span class="eyebrow rv">Equipe</span>
+    <h2 class="s-title rv">Pesquisadores e <em>bolsistas</em></h2>
+ 
+    <div class="equipe-layout">
+      <div class="coord-featured rv-left">
+        <img
+          class="cf-photo"
+          src="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/Rodrigo-de-Albuquerque-Coordenador-de-Projeto-LABSUL-2-150x150.jpg"
+          alt="Prof. Dr. Rodrigo de Albuquerque Marques"
+          onerror="this.style.minHeight='280px';this.style.background='#2B4F80'"
+        >
+        <div class="cf-name">Prof. Dr. Rodrigo de Albuquerque Marques</div>
+        <div class="cf-role">Doutor em Letras · Professor da FECLESC/UECE<br>Campus Quixadá · Ceará</div>
+        <span class="cf-badge">Coordenador do LabSul</span>
+        <div class="cf-contact">
+          <a href="mailto:rodrigo.marques@uece.br">✉ rodrigo.marques@uece.br</a>
+          <a href="tel:+5588999561200">📱 (88) 99956-1200</a>
+          <a href="https://www.instagram.com/lab_sul/" target="_blank">📸 @lab_sul</a>
+        </div>
+      </div>
+ 
+      <div>
+        <div class="bol-title rv">Bolsistas 2025–2026</div>
+        <div class="bol-grid rv-d1">
+          <div class="bol-card">
+            <div class="bol-av">VN</div>
+            <div><div class="bol-name">Valdiana do Nascimento Nobre</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">FS</div>
+            <div><div class="bol-name">Francisco Santiago R. Barreira</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">LF</div>
+            <div><div class="bol-name">Lia Felicidade C. Silva</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">AB</div>
+            <div><div class="bol-name">Analice Barros de Sousa</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">JC</div>
+            <div><div class="bol-name">Juliana Souza Cunha</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">NF</div>
+            <div><div class="bol-name">Nataniel Bezerra Felix</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">MM</div>
+            <div><div class="bol-name">Matheus Maciel Cardozo</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">AR</div>
+            <div><div class="bol-name">Antonio Renesson M. de Brito</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">FO</div>
+            <div><div class="bol-name">Francisca Oliveira dos Santos</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">RB</div>
+            <div><div class="bol-name">Roberto Oliveira Brito</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+          <div class="bol-card">
+            <div class="bol-av">VP</div>
+            <div><div class="bol-name">Vitória Gonçalves Pereira</div><div class="bol-role">Bolsista de extensão</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── CONTATO ── -->
+<section id="contato">
+  <div class="wrap">
+    <div class="contato-inner">
+      <div class="contato-left">
+        <span class="eyebrow eyebrow-light rv">Contato</span>
+        <h2 class="s-title s-title-light rv">Fale com o <em>LabSul</em></h2>
+        <p class="contato-tagline rv-d1">Pesquisadores, poetas, escolas e parceiros são sempre bem-vindos.</p>
+        <div class="c-info-list rv-d1">
+          <div class="c-info-item">
+            <div class="c-icon">🏛️</div>
+            <div>
+              <div class="c-label">Localização</div>
+              <div class="c-value">UECE — FECLESC · Quixadá, Ceará — Brasil</div>
+            </div>
+          </div>
+          <div class="c-info-item">
+            <div class="c-icon">✉️</div>
+            <div>
+              <div class="c-label">E-mail</div>
+              <div class="c-value"><a href="mailto:rodrigo.marques@uece.br">rodrigo.marques@uece.br</a></div>
+            </div>
+          </div>
+          <div class="c-info-item">
+            <div class="c-icon">📱</div>
+            <div>
+              <div class="c-label">Telefone</div>
+              <div class="c-value"><a href="tel:+5588999561200">(88) 99956-1200</a></div>
+            </div>
+          </div>
+          <div class="c-info-item">
+            <div class="c-icon">📸</div>
+            <div>
+              <div class="c-label">Instagram</div>
+              <div class="c-value"><a href="https://www.instagram.com/lab_sul/" target="_blank">@lab_sul</a></div>
+            </div>
+          </div>
+        </div>
+ 
+        <!-- Hospedagem info — parte do contrato R$1.250 -->
+        <div class="hospedagem-box rv-d2">
+          <div class="hb-title">Este site inclui</div>
+          <div class="hb-items">
+            <div class="hb-item">Domínio registrado (labsul.com.br)</div>
+            <div class="hb-item">Hospedagem em servidor de performance</div>
+            <div class="hb-item">SSL · Backups automáticos diários</div>
+            <div class="hb-item">Suporte técnico por 12 meses</div>
+            <div class="hb-item">Acesso à IA para atualizações ilimitadas</div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="rv-right">
+        <form class="form-v2" onsubmit="handleForm(event)">
+          <div class="fg">
+            <label class="fl">Nome completo</label>
+            <input class="fi" type="text" placeholder="Seu nome" required>
+          </div>
+          <div class="fg">
+            <label class="fl">E-mail</label>
+            <input class="fi" type="email" placeholder="seu@email.com" required>
+          </div>
+          <div class="fg">
+            <label class="fl">Vínculo / Instituição</label>
+            <input class="fi" type="text" placeholder="Universidade, escola, poeta independente…">
+          </div>
+          <div class="fg">
+            <label class="fl">Mensagem</label>
+            <textarea class="ft" placeholder="Colaboração, pesquisa, cordelteca, oficina…" required></textarea>
+          </div>
+          <button class="fs" type="submit">Enviar mensagem</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">Lab<span>Sul</span></div>
+      <p class="footer-tagline">
+        Laboratório de Formação em Cultura Popular Nordestina e Ibérica<br>
+        UECE · FECLESC · Quixadá — CE<br>
+        Projeto de Extensão · Rede INTERSET-CE
+      </p>
+    </div>
+    <div>
+      <div class="footer-col-title">Navegação</div>
+      <ul class="footer-links">
+        <li><a href="#sobre">Sobre o LabSul</a></li>
+        <li><a href="#objetivos">Objetivos</a></li>
+        <li><a href="#noticias">Notícias &amp; Atividades</a></li>
+        <li><a href="#galeria">Galeria de Fotos</a></li>
+        <li><a href="#acervo">Acervo &amp; Publicações</a></li>
+        <li><a href="#parceiros">Parcerias</a></li>
+        <li><a href="#equipe">Equipe</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Links externos</div>
+      <ul class="footer-links">
+        <li><a href="https://www.instagram.com/lab_sul/" target="_blank">Instagram @lab_sul</a></li>
+        <li><a href="https://redeintersetce.ufc.br/projeto/laboratorio-de-formacao-em-cultura-popular-nordestina-e-iberica-labsul/" target="_blank">Portal INTERSET-CE</a></li>
+        <li><a href="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/Getete-2025-v3.pdf" target="_blank">Informativo GETETE v1</a></li>
+        <li><a href="https://redeintersetce.ufc.br/wp-content/uploads/2025/07/Informativo-GETETE-2025-n2-3.pdf" target="_blank">Informativo GETETE v2</a></li>
+        <li><a href="https://uece.br" target="_blank">UECE</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 LabSul · UECE/FECLESC · Quixadá — CE</span>
+    <span class="footer-credit">Desenvolvido por <a href="#">Zup! Criativo</a> · Quixadá/CE</span>
+  </div>
+</footer>
+ 
+<script>
+/* ── Xilografia background cells ── */
+const icons = ['✦','◆','❋','✿','◈','❈','✤','◉'];
+const bg = document.getElementById('xiloBg');
+if (bg) {
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div');
+    c.className = 'xilo-cell';
+    c.textContent = icons[i % icons.length];
+    bg.appendChild(c);
+  }
+}
+ 
+/* ── Nav shrink on scroll ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+}, {passive:true});
+ 
+/* ── Mobile menu ── */
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+ 
+/* ── Acervo active cat ── */
+function setActiveCat(el) {
+  document.querySelectorAll('.acervo-cat').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+ 
+/* ── Scroll reveal ── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); }
+  });
+}, {threshold: 0.08, rootMargin: '0px 0px -20px 0px'});
+document.querySelectorAll('.rv,.rv-d1,.rv-d2,.rv-left,.rv-right').forEach(el => obs.observe(el));
+ 
+/* ── Form ── */
+function handleForm(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.fs');
+  btn.textContent = '✓ Enviado com sucesso!';
+  btn.style.background = '#2A6B3E';
+  setTimeout(() => {
+    btn.textContent = 'Enviar mensagem';
+    btn.style.background = '';
+    e.target.reset();
+  }, 4000);
+}
+ 
+/* ── Broken image fallback ── */
+document.querySelectorAll('img').forEach(img => {
+  img.addEventListener('error', function() { this.style.display = 'none'; });
+});
+</script>
+</body>
+</html>
