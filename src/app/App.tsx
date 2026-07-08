@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
 import { Menu, X, Play, ChevronRight, Mail, Phone, MapPin } from "lucide-react";
 
 import img1 from "../imports/Desktop1/18b0caf3897591d8c1c84007680e45ef3dd38e5e.png";
@@ -62,16 +63,45 @@ const ACERVO_CATEGORIES = [
   "Fotografia", "Registro Sonoro", "Manuscrito", "Indumentária",
 ];
 
-const BIBLIOTECA_ITEMS = [
-  { id: 1, title: "O Romanceiro da Incelença", type: "Livro", author: "Ariano Suassuna", year: "1974", desc: "Obra seminal do dramaturgo paraibano sobre a incelença, forma de lamento fúnebre da cultura nordestina, com análise etnográfica aprofundada." },
-  { id: 2, title: "Cordel: Antologia do Nordeste", type: "Antologia", author: "Vários autores", year: "1980", desc: "Coletânea abrangente de folhetos de cordel reunidos por pesquisadores de todo o Nordeste, com textos originais e notas críticas." },
-  { id: 3, title: "Cultura Popular e Identidade", type: "Artigo", author: "Roberto Melo", year: "2005", desc: "Artigo acadêmico que discute a relação entre manifestações culturais populares e a construção de identidades regionais no Brasil." },
-  { id: 4, title: "Mamulengo: Arte e Teatro", type: "Livro", author: "Hermilo Borba Filho", year: "1966", desc: "Estudo pioneiro sobre o teatro de bonecos popular pernambucano, suas origens ibéricas e suas expressões regionais únicas." },
-  { id: 5, title: "Forró: Raízes Nordestinas", type: "Livro", author: "José Teles", year: "1998", desc: "História musical e cultural do forró, desde suas raízes no sertão até sua difusão nacional, com depoimentos de grandes nomes." },
-  { id: 6, title: "A Xilogravura Popular", type: "Catálogo", author: "Múcio Bezerra", year: "2010", desc: "Catálogo de exposição reunindo as principais obras de xilogravuristas nordestinos, com fichas técnicas e contexto histórico." },
-  { id: 7, title: "Vozes do Sertão", type: "Artigo", author: "Leda Martins", year: "2015", desc: "Pesquisa etnográfica sobre a cantoria e o repente no sertão nordestino, explorando a tradição oral e suas transformações contemporâneas." },
-  { id: 8, title: "Festa e Sagrado no Nordeste", type: "Livro", author: "Clarisse Novaes", year: "2009", desc: "Análise das festas populares nordestinas em sua dimensão religiosa e comunitária, com ênfase no ciclo junino e nas procissões." },
-];
+// BIBLIOTECA_ITEMS agora vem do Supabase (tabela "livros") via o hook useLivros().
+function useLivros() {
+    const [items, setItems] = useState<any[]>([]);
+
+    useEffect(() => {
+          let ativo = true;
+
+          supabase
+            .from("livros")
+            .select("*")
+            .order("criado_em", { ascending: false })
+            .then(({ data, error }) => {
+                      if (!ativo) return;
+                      if (error) {
+                                  console.error("Erro ao buscar livros no Supabase:", error.message);
+                                  return;
+                      }
+                      if (data) {
+                                  setItems(
+                                                data.map((row) => ({
+                                                                id: row.id,
+                                                                title: row.titulo,
+                                                                type: row.categoria || "Livro",
+                                                                author: row.autor,
+                                                                year: row.ano ? String(row.ano) : "",
+                                                                desc: row.descricao,
+                                                                img: row.imagem_url,
+                                                }))
+                                              );
+                      }
+            });
+
+          return () => {
+                  ativo = false;
+          };
+    }, []);
+
+    return items;
+}
 
 const BIBLIOTECA_TYPES = ["Todos", "Livro", "Artigo", "Antologia", "Catálogo"];
 
@@ -853,6 +883,7 @@ function PageAcervoItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
+    const BIBLIOTECA_ITEMS = useLivros();
   const [search, setSearch] = useState("");
   const [activeType, setActiveType] = useState("Todos");
 
@@ -947,7 +978,11 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageBibliotecaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const item = BIBLIOTECA_ITEMS[0];
+const BIBLIOTECA_ITEMS = useLivros();
+    const item = BIBLIOTECA_ITEMS[0];
+    if (!item) {
+    return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+    }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
