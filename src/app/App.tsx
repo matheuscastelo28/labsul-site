@@ -134,14 +134,7 @@ const BIBLIOTECA_TYPES = ["Todos", "Livro", "Artigo", "Antologia", "Catálogo"];
 
 function useNoticias() { const [items, setItems] = useState<any[]>([]); useEffect(() => { let ativo = true; supabase.from("noticias").select("*").order("criado_em", { ascending: false }).then(({ data, error }) => { if (!ativo) return; if (error) { console.error("Erro ao buscar noticias no Supabase:", error.message); return; } if (data) { setItems(data.map((row) => ({ id: row.id, title: row.titulo, date: row.data_publicacao, category: row.categoria, excerpt: row.resumo, img: row.imagem_url }))); } }); return () => { ativo = false; }; }, []); return items; }
 
-const ENTREVISTAS = [
-  { id: 1, name: "Mestre Dila", role: "Xilogravurista", duration: "45 min", date: "10 Jun 2025", img: imgP1, tags: ["Xilogravura", "Artesanato"], desc: "Mestre Dila é um dos grandes nomes da xilogravura popular nordestina. Nesta conversa, ele fala sobre sua trajetória, o processo criativo e o futuro da arte popular.", content: "A xilogravura é a língua visual do Nordeste. Cada linha cortada na madeira é uma palavra de resistência. Mestre Dila conduz o LabSul por dentro de seu ateliê, explicando cada etapa do processo — da escolha da madeira à impressão final.\n\nEle fala também sobre como aprendeu com seu pai, e como passou esse conhecimento para as novas gerações. \"Não deixo morrer. Ensino quem quiser aprender. A arte popular não tem dono, tem guardiões.\"\n\nA entrevista aborda ainda a relação entre arte popular e identidade nordestina, e os desafios do mercado de arte para artesãos da região." },
-  { id: 2, name: "Dra. Mariana Lima", role: "Pesquisadora de cultura popular", duration: "38 min", date: "02 Mai 2025", img: imgP4, tags: ["Pesquisa", "Academia"], desc: "Pesquisadora com vinte anos de dedicação ao estudo das festas populares nordestinas. Nesta entrevista, discute metodologia, campo e o papel das universidades.", content: "A pesquisa em cultura popular exige presença, escuta e humildade. A Dra. Mariana Lima compartilha sua trajetória de pesquisadora de campo, desde o doutorado em Recife até expedições pelos estados do Nordeste.\n\nEla comenta sobre os principais desafios metodológicos e a importância de construir relações de confiança com as comunidades pesquisadas. \"Não somos apenas observadores. Somos parte do que documentamos.\"\n\nA entrevista também aborda a relação entre academia e saberes tradicionais, e como as universidades podem contribuir para a preservação da cultura popular sem folclorizá-la." },
-  { id: 3, name: "Patativa do Assaré", role: "Cantador e cordelista", duration: "52 min", date: "18 Abr 2025", img: null, tags: ["Cantoria", "Cordel"], desc: "Uma das vozes mais marcantes da cultura popular cearense. Nesta gravação histórica, fala sobre o sertão, a seca e a força da palavra.", content: "O cordel é a memória do povo. Quem escreve cordel escreve história verdadeira. Nesta entrevista memorável, o poeta fala sobre suas origens em Assaré, no Ceará, e como a paisagem seca do sertão moldou sua visão de mundo.\n\nPatativa discorre sobre a tradição da cantoria nordestina, a improvisação dos repentistas e o papel do trovador como porta-voz das comunidades rurais. \"Meu verso é simples porque a vida do sertanejo é simples. Mas não é pequena.\"\n\nA conversa toca também nos temas recorrentes de sua obra: a seca, a migração, a fé e a resistência do povo nordestino." },
-  { id: 4, name: "Mestra Teresinha", role: "Educadora popular e manipuladora de bonecos", duration: "41 min", date: "05 Mar 2025", img: null, tags: ["Educação", "Mamulengo"], desc: "Mestra Teresinha dedica sua vida ao mamulengo como ferramenta de educação popular. Ela fala sobre bonecos, crianças e transformação social.", content: "O boneco entra onde o professor não consegue entrar. Mestra Teresinha usa o mamulengo há mais de três décadas como ferramenta pedagógica em comunidades periféricas do Nordeste.\n\nEla conta como aprendeu a manipular bonecos com sua avó, e como transformou esse conhecimento em método de ensino. \"Quando a criança vê o boneco falar sobre sua vida, ela se vê. E aí começa a aprendizagem de verdade.\"\n\nA entrevista discute também os desafios de manter viva uma tradição artesanal em tempos de tela, e o papel das políticas públicas na valorização das artes populares." },
-  { id: 5, name: "Prof. João Batista", role: "Pesquisador e músico", duration: "35 min", date: "20 Fev 2025", img: imgP5, tags: ["Forró", "Música"], desc: "Professor e músico que dedicou sua carreira ao estudo do forró como expressão cultural e política do Nordeste.", content: "O forró não é apenas música. É uma forma de estar no mundo. O Prof. João Batista conduz a conversa por dentro da história do forró, desde as sanfonas de Luiz Gonzaga até os festivais contemporâneos.\n\nEle discute a diferença entre o forró tradicional e as versões eletrônicas, e defende que ambas são manifestações legítimas de uma cultura viva. \"Cultura popular não é museu. Ela se transforma porque está viva.\"\n\nA entrevista aborda ainda o forró como instrumento de resistência política durante a ditadura, e seu papel atual na construção de uma identidade nordestina positiva." },
-  { id: 6, name: "Arlete Ferreira", role: "Artesã ceramista", duration: "29 min", date: "10 Jan 2025", img: null, tags: ["Cerâmica", "Artesanato"], desc: "Artesã de Caruaru que mantém viva a tradição da cerâmica figurativa popular, herdada de Mestre Vitalino.", content: "A argila guarda a memória das mãos que a moldaram. Arlete Ferreira aprendeu a trabalhar com cerâmica com sua mãe, que por sua vez aprendeu com uma das discípulas de Mestre Vitalino em Caruaru.\n\nEla fala sobre o processo criativo — como as figuras surgem da observação da vida cotidiana do sertão — e sobre os desafios de viver da arte popular. \"A peça que faço hoje guarda algo de todas as mãos que me ensinaram. É uma herança viva.\"\n\nA conversa toca também na importância do LabSul e de outros espaços culturais para conectar artesãos com pesquisadores e públicos mais amplos." },
-];
+function useEntrevistas() { const [items, setItems] = useState<any[]>([]); useEffect(() => { let ativo = true; supabase.from("entrevistas").select("*").order("criado_em", { ascending: false }).then(({ data, error }) => { if (!ativo) return; if (error) { console.error("Erro ao buscar entrevistas no Supabase:", error.message); return; } if (data) { setItems(data.map((row) => ({ id: row.id, name: row.nome, role: row.cargo, duration: row.duracao, date: row.data_gravacao, img: row.imagem_url, tags: row.tags || [], desc: row.resumo, content: row.conteudo }))); } }); return () => { ativo = false; }; }, []); return items; }
 
 const WORKSHOPS = [
   { id: 1, title: "Oficina de Xilogravura", dates: "Mar–Abr 2025", level: "Iniciante", spots: "12 vagas", duration: "8 semanas", schedule: "Sábados, 9h–13h", local: "LabSul – Quixadá, CE", img: imgP1, desc: "Aprenda as técnicas fundamentais da xilogravura popular nordestina com um mestre da arte. Da escolha da madeira à impressão final, você produzirá suas próprias matrizes." },
@@ -1201,17 +1194,14 @@ function PageNoticiaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[#2b0101] text-[12px] uppercase mb-6 tracking-widest font-medium">OUTRAS NOTÍCIAS</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {NOTICIAS.slice(1, 4).map((n) => (
+            {NOTICIAS_ITEMS.slice(1, 4).map((n) => (
               <button
                 key={n.id}
                 onClick={() => onNavigate("noticia-item")}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[160px] overflow-hidden">
-                  {n.img
-                    ? <img src={n.img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
-                  }
+                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                 </div>
                 <div className="p-5">
                   <p className="text-[#f3d7af] text-[11px] mb-1">{n.date}</p>
@@ -1228,6 +1218,7 @@ function PageNoticiaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageEntrevistas({ onNavigate }: { onNavigate: (p: Page) => void }) {
+const ENTREVISTAS_ITEMS = useEntrevistas();
   return (
     <div className="bg-[#2b0101]">
       <section className="bg-[#d9b244] py-16 relative overflow-hidden">
@@ -1248,17 +1239,14 @@ function PageEntrevistas({ onNavigate }: { onNavigate: (p: Page) => void }) {
       <section className="bg-[#2b0101] py-16">
         <div className="max-w-[1440px] mx-auto px-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ENTREVISTAS.map((item) => (
+            {ENTREVISTAS_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => onNavigate("entrevista-item")}
                 className="bg-[#3f0a0e] overflow-hidden group hover:bg-[#4a0e12] transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244]"
               >
                 <div className="relative h-[240px] overflow-hidden">
-                  {item.img
-                    ? <img src={item.img} alt={item.name} className="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
-                    : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
-                  }
+                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-14 h-14 rounded-full bg-[#f53c25] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <Play size={20} fill="white" className="text-white ml-1" />
@@ -1286,7 +1274,7 @@ function PageEntrevistas({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageEntrevistaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const item = ENTREVISTAS[0];
+  const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1304,10 +1292,7 @@ function PageEntrevistaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
           <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 items-start">
             <div>
               <div className="bg-[#3f0a0e] relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
-                {item.img
-                  ? <img src={item.img} alt={item.name} className="w-full h-full object-cover opacity-80" />
-                  : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
-                }
+                <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                 <div className="absolute inset-0 flex items-end justify-center pb-8">
                   <div className="bg-[#2b0101]/80 px-6 py-4 flex items-center gap-4 w-full mx-4">
                     <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer">
@@ -1356,17 +1341,14 @@ function PageEntrevistaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[12px] uppercase text-[#2e0e15] mb-4 tracking-widest font-medium">OUTRAS ENTREVISTAS</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {ENTREVISTAS.slice(1, 4).map((e) => (
+            {ENTREVISTAS_ITEMS.slice(1, 4).map((e) => (
               <button
                 key={e.id}
                 onClick={() => onNavigate("entrevista-item")}
                 className="bg-[#2e0e15] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244] group"
               >
                 <div className="relative h-[180px] overflow-hidden">
-                  {e.img
-                    ? <img src={e.img} alt={e.name} className="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
-                    : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
-                  }
+                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-10 h-10 rounded-full bg-[#f53c25] flex items-center justify-center">
                       <Play size={14} fill="white" className="text-white ml-0.5" />
