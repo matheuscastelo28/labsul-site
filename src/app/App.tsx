@@ -46,22 +46,49 @@ const NAV_LINKS: { label: string; page: Page }[] = [
   { label: "ATELIÊ", page: "atelie" },
 ];
 
-const ACERVO_ITEMS = [
-  { id: 1, title: "Xilogravura: Lampião e Maria Bonita", category: "Xilogravura", year: "1980", origin: "Juazeiro do Norte", img: imgHero },
-  { id: 2, title: "Cordel: A Saga do Cangaço", category: "Cordel", year: "1975", origin: "Recife", img: imgNews },
-  { id: 3, title: "Mamulengo: Conjunto de bonecos", category: "Mamulengo", year: "1965", origin: "Caruaru", img: imgP1 },
-  { id: 4, title: "Forró: Registro sonoro de Luiz Gonzaga", category: "Registro Sonoro", year: "1950", origin: "Exu", img: imgP4 },
-  { id: 5, title: "Reisado: Documentário fotográfico", category: "Fotografia", year: "1990", origin: "Sobral", img: imgP2 },
-  { id: 6, title: "Bumba-meu-boi: Traje ritual", category: "Indumentária", year: "2000", origin: "São Luís", img: imgP3 },
-  { id: 7, title: "Cerâmica: Figuração de Mestre Vitalino", category: "Cerâmica", year: "1970", origin: "Caruaru", img: imgP5 },
-  { id: 8, title: "Quadrilha junina: Caderno de danças", category: "Manuscrito", year: "1985", origin: "Campina Grande", img: imgHero },
-  { id: 9, title: "Cantoria: Gravação de repentistas", category: "Registro Sonoro", year: "1978", origin: "Mossoró", img: imgNews },
-];
+// ACERVO_ITEMS agora vem do Supabase (tabela "cordeis") via o hook useCordeis().
+function useCordeis() {
+    const [items, setItems] = useState<any[]>([]);
+
+    useEffect(() => {
+          let ativo = true;
+
+          supabase
+            .from("cordeis")
+            .select("*")
+            .order("criado_em", { ascending: false })
+            .then(({ data, error }) => {
+                      if (!ativo) return;
+                      if (error) {
+                                  console.error("Erro ao buscar itens do acervo no Supabase:", error.message);
+                                  return;
+                      }
+                      if (data) {
+                                  setItems(
+                                                data.map((row) => ({
+                                                                id: row.id,
+                                                                title: row.titulo,
+                                                                category: row.categoria,
+                                                                year: row.ano ? String(row.ano) : "",
+                                                                origin: row.origem,
+                                                                img: row.imagem_url,
+                                                }))
+                                              );
+                      }
+            });
+
+          return () => {
+                  ativo = false;
+          };
+    }, []);
+
+    return items;
+}
 
 const ACERVO_CATEGORIES = [
-  "Todos", "Xilogravura", "Cordel", "Mamulengo", "Cerâmica",
-  "Fotografia", "Registro Sonoro", "Manuscrito", "Indumentária",
-];
+    "Todos", "Xilogravura", "Cordel", "Mamulengo", "Cerâmica",
+    "Fotografia", "Registro Sonoro", "Manuscrito", "Indumentária",
+  ];
 
 // BIBLIOTECA_ITEMS agora vem do Supabase (tabela "livros") via o hook useLivros().
 function useLivros() {
@@ -697,11 +724,12 @@ function PageSobre({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
+    const ACERVO_ITEMS = useCordeis();
   const [activeFilter, setActiveFilter] = useState("Todos");
   const [search, setSearch] = useState("");
 
   const filtered = ACERVO_ITEMS.filter((item) => {
-    const matchCat = activeFilter === "Todos" || item.category === activeFilter;
+      const matchCat = activeFilter === "Todos" || item.category === activeFilter;
     const matchSearch =
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       item.category.toLowerCase().includes(search.toLowerCase());
@@ -771,7 +799,7 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" />
+                  <ImgPlaceholder className="w-full h-full" label="imagem em breve" />
                   <div className="absolute top-3 left-3">
                     <Tag label={item.category} />
                   </div>
@@ -791,9 +819,13 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAcervoItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const item = ACERVO_ITEMS[0];
-  return (
-    <div className="bg-[#2b0101]">
+  const ACERVO_ITEMS = useCordeis();
+const item = ACERVO_ITEMS[0];
+    if (!item) {
+          return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+    }
+    return (
+        <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
         <div className="flex items-center gap-2 text-[12px] font-['Inter']">
           <button onClick={() => onNavigate("home")} className="text-[#f3d7af] hover:text-[#ffb928] transition-colors">Início</button>
@@ -867,7 +899,7 @@ function PageAcervoItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[160px] overflow-hidden">
-                  <img src={relItem.img} alt={relItem.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
+                  <ImgPlaceholder className="w-full h-full" label="imagem em breve" />
                 </div>
                 <div className="p-4">
                   <p className="text-[#f3e0b7] text-base font-medium leading-snug">{relItem.title}</p>
