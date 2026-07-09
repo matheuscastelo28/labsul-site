@@ -132,14 +132,7 @@ function useLivros() {
 
 const BIBLIOTECA_TYPES = ["Todos", "Livro", "Artigo", "Antologia", "Catálogo"];
 
-const NOTICIAS = [
-  { id: 1, title: "Abertura da exposição \"Matrizes do Sertão\"", date: "15 Jun 2025", category: "Exposição", excerpt: "A exposição reúne mais de 80 obras de artistas do sertão nordestino, explorando a tradição da xilogravura e do cordel.", img: imgNews },
-  { id: 2, title: "Oficina de xilogravura com Mestre Dila", date: "20 Mai 2025", category: "Oficina", excerpt: "Duas semanas de oficinas intensivas com o mestre xilogravurista Dila, referência nacional da arte popular nordestina.", img: imgHero },
-  { id: 3, title: "Lançamento do acervo digital de cordéis", date: "08 Abr 2025", category: "Digital", excerpt: "Mais de 500 folhetos de cordel já estão disponíveis gratuitamente no portal do LabSul.", img: null },
-  { id: 4, title: "Parceria com universidades nordestinas", date: "15 Mar 2025", category: "Instituição", excerpt: "Acordo de cooperação com cinco universidades da região para pesquisa conjunta sobre cultura popular.", img: null },
-  { id: 5, title: "Registro de mestres da cantoria", date: "02 Fev 2025", category: "Pesquisa", excerpt: "Campanha de registro audiovisual de repentistas e cantadores em sete estados do Nordeste.", img: imgNews },
-  { id: 6, title: "Ateliê de formação: novos inscritos", date: "10 Jan 2025", category: "Formação", excerpt: "O Ateliê LabSul abre 30 vagas para o programa de formação em cultura popular com início em março.", img: null },
-];
+function useNoticias() { const [items, setItems] = useState<any[]>([]); useEffect(() => { let ativo = true; supabase.from("noticias").select("*").order("criado_em", { ascending: false }).then(({ data, error }) => { if (!ativo) return; if (error) { console.error("Erro ao buscar noticias no Supabase:", error.message); return; } if (data) { setItems(data.map((row) => ({ id: row.id, title: row.titulo, date: row.data_publicacao, category: row.categoria, excerpt: row.resumo, img: row.imagem_url }))); } }); return () => { ativo = false; }; }, []); return items; }
 
 const ENTREVISTAS = [
   { id: 1, name: "Mestre Dila", role: "Xilogravurista", duration: "45 min", date: "10 Jun 2025", img: imgP1, tags: ["Xilogravura", "Artesanato"], desc: "Mestre Dila é um dos grandes nomes da xilogravura popular nordestina. Nesta conversa, ele fala sobre sua trajetória, o processo criativo e o futuro da arte popular.", content: "A xilogravura é a língua visual do Nordeste. Cada linha cortada na madeira é uma palavra de resistência. Mestre Dila conduz o LabSul por dentro de seu ateliê, explicando cada etapa do processo — da escolha da madeira à impressão final.\n\nEle fala também sobre como aprendeu com seu pai, e como passou esse conhecimento para as novas gerações. \"Não deixo morrer. Ensino quem quiser aprender. A arte popular não tem dono, tem guardiões.\"\n\nA entrevista aborda ainda a relação entre arte popular e identidade nordestina, e os desafios do mercado de arte para artesãos da região." },
@@ -398,6 +391,7 @@ function Footer({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const NOTICIAS_ITEMS = useNoticias();
 
   return (
     <div className="bg-[#2b0101]">
@@ -579,17 +573,14 @@ function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {NOTICIAS.slice(0, 3).map((item) => (
+            {NOTICIAS_ITEMS.slice(0, 3).map((item) => (
               <button
                 key={item.id}
                 onClick={() => onNavigate("noticia-item")}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[256px] overflow-hidden">
-                  {item.img
-                    ? <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
-                  }
+                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                 </div>
                 <div className="p-6">
                   <p className="text-[#f3e0b7] text-[12px] mb-2">{item.date}</p>
@@ -1099,9 +1090,10 @@ const BIBLIOTECA_ITEMS = useLivros();
 }
 
 function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
+  const NOTICIAS_ITEMS = useNoticias();
   const categories = ["Todos", "Exposição", "Oficina", "Digital", "Pesquisa", "Formação", "Instituição"];
   const [activeFilter, setActiveFilter] = useState("Todos");
-  const filtered = NOTICIAS.filter((n) => activeFilter === "Todos" || n.category === activeFilter);
+  const filtered = NOTICIAS_ITEMS.filter((n) => activeFilter === "Todos" || n.category === activeFilter);
 
   return (
     <div className="bg-[#2b0101]">
@@ -1146,10 +1138,7 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  {item.img
-                    ? <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
-                  }
+                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                   <div className="absolute top-3 left-3">
                     <Tag label={item.category} />
                   </div>
@@ -1170,7 +1159,7 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageNoticiaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const item = NOTICIAS[0];
+  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1189,10 +1178,7 @@ function PageNoticiaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
           <h1 className="font-['Inter'] font-semibold text-[44px] text-[#f3e0b7] leading-tight mt-5 mb-4">{item.title}</h1>
           <p className="text-[#f3d7af] text-base mb-10">{item.date} · Por Equipe LabSul</p>
           <div className="mb-10">
-            {item.img
-              ? <img src={imgNews} alt="" className="w-full object-cover" style={{ maxHeight: "450px" }} />
-              : <ImgPlaceholder className="w-full h-[350px]" label="foto em breve" />
-            }
+            <ImgPlaceholder className="w-full h-[350px]" label="foto em breve" />
           </div>
           <div className="text-[#f3d7af] text-lg leading-relaxed space-y-6">
             <p>A exposição "Matrizes do Sertão" reúne mais de 80 obras de artistas do sertão nordestino, explorando a rica tradição da xilogravura e do cordel como formas de resistência e identidade cultural.</p>
