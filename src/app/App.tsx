@@ -136,12 +136,7 @@ function useNoticias() { const [items, setItems] = useState<any[]>([]); useEffec
 
 function useEntrevistas() { const [items, setItems] = useState<any[]>([]); useEffect(() => { let ativo = true; supabase.from("entrevistas").select("*").order("criado_em", { ascending: false }).then(({ data, error }) => { if (!ativo) return; if (error) { console.error("Erro ao buscar entrevistas no Supabase:", error.message); return; } if (data) { setItems(data.map((row) => ({ id: row.id, name: row.nome, role: row.cargo, duration: row.duracao, date: row.data_gravacao, img: row.imagem_url, tags: row.tags || [], desc: row.resumo, content: row.conteudo }))); } }); return () => { ativo = false; }; }, []); return items; }
 
-const WORKSHOPS = [
-  { id: 1, title: "Oficina de Xilogravura", dates: "Mar–Abr 2025", level: "Iniciante", spots: "12 vagas", duration: "8 semanas", schedule: "Sábados, 9h–13h", local: "LabSul – Quixadá, CE", img: imgP1, desc: "Aprenda as técnicas fundamentais da xilogravura popular nordestina com um mestre da arte. Da escolha da madeira à impressão final, você produzirá suas próprias matrizes." },
-  { id: 2, title: "Cordel e Literatura Popular", dates: "Abr–Mai 2025", level: "Todos os níveis", spots: "20 vagas", duration: "6 semanas", schedule: "Quintas-feiras, 18h–21h", local: "LabSul – Quixadá, CE", img: imgP4, desc: "Explore a tradição do cordel nordestino: métrica, rima, oração e narrativa. Ao final, você terá composto e diagramado seu próprio folheto de cordel." },
-  { id: 3, title: "Cerâmica Nordestina", dates: "Mai–Jun 2025", level: "Intermediário", spots: "8 vagas", duration: "10 semanas", schedule: "Sábados, 14h–18h", local: "LabSul – Quixadá, CE", img: imgP2, desc: "Imersão na tradição da cerâmica figurativa inspirada em Mestre Vitalino. Técnicas de modelagem manual, queima e acabamento com materiais naturais da região." },
-  { id: 4, title: "Mamulengo e Teatro Popular", dates: "Jun–Jul 2025", level: "Todos os níveis", spots: "15 vagas", duration: "8 semanas", schedule: "Sextas-feiras, 18h–21h", local: "LabSul – Quixadá, CE", img: imgP3, desc: "Construção e manipulação de bonecos de mamulengo. Aprenda a criar personagens tradicionais, técnicas de voz e o vocabulário cênico do teatro popular nordestino." },
-];
+function useWorkshops() { const [items, setItems] = useState<any[]>([]); useEffect(() => { let ativo = true; supabase.from("workshops").select("*").order("criado_em", { ascending: false }).then(({ data, error }) => { if (!ativo) return; if (error) { console.error("Erro ao buscar workshops no Supabase:", error.message); return; } if (data) { setItems(data.map((row) => ({ id: row.id, title: row.titulo, dates: row.datas, level: row.nivel, spots: row.vagas, duration: row.duracao, schedule: row.horario, local: row.local, img: row.imagem_url, desc: row.descricao }))); } }); return () => { ativo = false; }; }, []); return items; }
 
 // ─── Shared Components ────────────────────────────────────────────────────────
 
@@ -1440,6 +1435,7 @@ function PageGaleria() {
 }
 
 function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
+  const workshops = useWorkshops();
   return (
     <div className="bg-[#2b0101]">
       <section className="relative overflow-hidden bg-[#2b0101] py-20">
@@ -1469,7 +1465,7 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
             Oficinas em andamento
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {WORKSHOPS.map((w) => (
+            {workshops.map((w) => (
               <div key={w.id} className="bg-[#9b2220] overflow-hidden flex flex-col sm:flex-row">
                 <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
                   <img src={w.img} alt={w.title} className="w-full h-full object-cover opacity-70" />
@@ -1519,7 +1515,7 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAtelieInscricao({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const workshop = WORKSHOPS[0];
+  const workshops = useWorkshops(); const workshop = workshops[0]; if (!workshop) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
 
