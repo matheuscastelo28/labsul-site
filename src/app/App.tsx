@@ -31,7 +31,8 @@ type Page =
   | "galeria"
   | "atelie"
   | "atelie-inscricao"
-  | "contato";
+  | "contato"
+  | "admin";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -369,6 +370,7 @@ function Footer({ onNavigate }: { onNavigate: (p: Page) => void }) {
         <div className="mt-12 pt-6 border-t border-[#3f0a0e] flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="text-[12px] text-[#f3d7af]/60">© 2025 LabSul — Todos os direitos reservados</p>
           <p className="text-[12px] text-[#f3d7af]/60">Quixadá, Ceará · Cultura Popular Nordestina e Ibérica</p>
+          <button onClick={() => onNavigate("admin")} className="text-[11px] text-[#f3d7af]/30 hover:text-[#f3d7af]/60 transition-colors">Admin</button>
         </div>
       </div>
     </footer>
@@ -1757,6 +1759,426 @@ function PageContato() {
   );
 }
 
+// ─── Admin ────────────────────────────────────────────────────────────────────
+
+type AdminFieldType = "text" | "number" | "textarea" | "tags";
+type AdminField = { key: string; label: string; type: AdminFieldType };
+type AdminSection = { key: string; label: string; table: string; titleField: string; fields: AdminField[] };
+
+const ADMIN_SECTIONS: AdminSection[] = [
+  {
+    key: "cordeis",
+    label: "Acervo",
+    table: "cordeis",
+    titleField: "titulo",
+    fields: [
+      { key: "titulo", label: "Título", type: "text" },
+      { key: "categoria", label: "Categoria", type: "text" },
+      { key: "ano", label: "Ano", type: "number" },
+      { key: "origem", label: "Origem", type: "text" },
+      { key: "autor", label: "Autor", type: "text" },
+      { key: "descricao", label: "Descrição", type: "textarea" },
+      { key: "imagem_url", label: "URL da imagem", type: "text" },
+    ],
+  },
+  {
+    key: "livros",
+    label: "Biblioteca",
+    table: "livros",
+    titleField: "titulo",
+    fields: [
+      { key: "titulo", label: "Título", type: "text" },
+      { key: "categoria", label: "Categoria", type: "text" },
+      { key: "autor", label: "Autor", type: "text" },
+      { key: "ano", label: "Ano", type: "number" },
+      { key: "descricao", label: "Descrição", type: "textarea" },
+      { key: "imagem_url", label: "URL da imagem", type: "text" },
+    ],
+  },
+  {
+    key: "noticias",
+    label: "Notícias",
+    table: "noticias",
+    titleField: "titulo",
+    fields: [
+      { key: "titulo", label: "Título", type: "text" },
+      { key: "categoria", label: "Categoria", type: "text" },
+      { key: "data_publicacao", label: "Data de publicação", type: "text" },
+      { key: "resumo", label: "Resumo", type: "textarea" },
+      { key: "imagem_url", label: "URL da imagem", type: "text" },
+    ],
+  },
+  {
+    key: "entrevistas",
+    label: "Entrevistas",
+    table: "entrevistas",
+    titleField: "nome",
+    fields: [
+      { key: "nome", label: "Nome", type: "text" },
+      { key: "cargo", label: "Cargo", type: "text" },
+      { key: "duracao", label: "Duração", type: "text" },
+      { key: "data_gravacao", label: "Data de gravação", type: "text" },
+      { key: "tags", label: "Tags (separadas por vírgula)", type: "tags" },
+      { key: "resumo", label: "Resumo", type: "textarea" },
+      { key: "conteudo", label: "Conteúdo", type: "textarea" },
+      { key: "imagem_url", label: "URL da imagem", type: "text" },
+    ],
+  },
+  {
+    key: "workshops",
+    label: "Ateliê",
+    table: "workshops",
+    titleField: "titulo",
+    fields: [
+      { key: "titulo", label: "Título", type: "text" },
+      { key: "datas", label: "Datas", type: "text" },
+      { key: "nivel", label: "Nível", type: "text" },
+      { key: "vagas", label: "Vagas", type: "text" },
+      { key: "duracao", label: "Duração", type: "text" },
+      { key: "horario", label: "Horário", type: "text" },
+      { key: "local", label: "Local", type: "text" },
+      { key: "imagem_url", label: "URL da imagem", type: "text" },
+      { key: "descricao", label: "Descrição", type: "textarea" },
+    ],
+  },
+];
+
+function AdminLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) setError("E-mail ou senha inválidos.");
+  };
+
+  return (
+    <div className="bg-[#2b0101] min-h-[70vh] flex items-center justify-center px-6 py-20">
+      <form onSubmit={handleSubmit} className="bg-[#fbdfb5] p-10 w-full max-w-sm">
+        <p className="text-[12px] uppercase text-[#9b2220] mb-2 tracking-widest font-medium">ÁREA RESTRITA</p>
+        <h1 className="font-['Inter'] font-semibold text-[28px] text-[#2e0e15] mb-8">Painel Administrativo</h1>
+        <div className="mb-5">
+          <label htmlFor="admin-email" className="block text-[#2e0e15] text-[12px] font-medium mb-2 uppercase tracking-widest">E-mail</label>
+          <input id="admin-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors" />
+        </div>
+        <div className="mb-6">
+          <label htmlFor="admin-password" className="block text-[#2e0e15] text-[12px] font-medium mb-2 uppercase tracking-widest">Senha</label>
+          <input id="admin-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors" />
+        </div>
+        {error && <p className="text-[#9b2220] text-sm mb-4">{error}</p>}
+        <button type="submit" disabled={loading} className="w-full bg-[#9b2220] text-[#f3deb7] text-base uppercase py-3 rounded-lg hover:bg-[#ca1419] transition-colors disabled:opacity-60">
+          {loading ? "ENTRANDO..." : "ENTRAR"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function AdminSetPassword({ onDone }: { onDone: () => void }) {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (password.length < 6) { setError("A senha deve ter pelo menos 6 caracteres."); return; }
+    if (password !== confirm) { setError("As senhas não coincidem."); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setLoading(false);
+    if (error) { setError("Não foi possível definir a senha. Tente novamente."); return; }
+    onDone();
+  };
+
+  return (
+    <div className="bg-[#2b0101] min-h-[70vh] flex items-center justify-center px-6 py-20">
+      <form onSubmit={handleSubmit} className="bg-[#fbdfb5] p-10 w-full max-w-sm">
+        <p className="text-[12px] uppercase text-[#9b2220] mb-2 tracking-widest font-medium">BEM-VINDO</p>
+        <h1 className="font-['Inter'] font-semibold text-[28px] text-[#2e0e15] mb-8">Defina sua senha</h1>
+        <div className="mb-5">
+          <label htmlFor="new-password" className="block text-[#2e0e15] text-[12px] font-medium mb-2 uppercase tracking-widest">Nova senha</label>
+          <input id="new-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors" />
+        </div>
+        <div className="mb-6">
+          <label htmlFor="confirm-password" className="block text-[#2e0e15] text-[12px] font-medium mb-2 uppercase tracking-widest">Confirmar senha</label>
+          <input id="confirm-password" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors" />
+        </div>
+        {error && <p className="text-[#9b2220] text-sm mb-4">{error}</p>}
+        <button type="submit" disabled={loading} className="w-full bg-[#9b2220] text-[#f3deb7] text-base uppercase py-3 rounded-lg hover:bg-[#ca1419] transition-colors disabled:opacity-60">
+          {loading ? "SALVANDO..." : "SALVAR SENHA"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function AdminTable({ section }: { section: AdminSection }) {
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingRow, setEditingRow] = useState<any | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState<Record<string, any>>({});
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const load = () => {
+    setLoading(true);
+    supabase
+      .from(section.table)
+      .select("*")
+      .order("criado_em", { ascending: false })
+      .then(({ data, error }) => {
+        setLoading(false);
+        if (error) { setError(error.message); return; }
+        setRows(data || []);
+      });
+  };
+
+  useEffect(() => { load(); setEditingRow(null); setCreating(false); setError(""); }, [section.key]);
+
+  const startCreate = () => {
+    const blank: Record<string, any> = {};
+    section.fields.forEach((f) => { blank[f.key] = ""; });
+    setForm(blank);
+    setCreating(true);
+    setEditingRow(null);
+  };
+
+  const startEdit = (row: any) => {
+    const values: Record<string, any> = {};
+    section.fields.forEach((f) => {
+      const v = row[f.key];
+      values[f.key] = f.type === "tags" ? (Array.isArray(v) ? v.join(", ") : "") : (v ?? "");
+    });
+    setForm(values);
+    setEditingRow(row);
+    setCreating(false);
+  };
+
+  const cancelForm = () => {
+    setEditingRow(null);
+    setCreating(false);
+    setError("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    const payload: Record<string, any> = {};
+    section.fields.forEach((f) => {
+      if (f.type === "number") {
+        payload[f.key] = form[f.key] === "" ? null : Number(form[f.key]);
+      } else if (f.type === "tags") {
+        payload[f.key] = form[f.key]
+          ? String(form[f.key]).split(",").map((s: string) => s.trim()).filter(Boolean)
+          : [];
+      } else {
+        payload[f.key] = form[f.key];
+      }
+    });
+    payload.atualizado_em = new Date().toISOString();
+
+    let resultError = null;
+    if (creating) {
+      const { error } = await supabase.from(section.table).insert(payload);
+      resultError = error;
+    } else if (editingRow) {
+      const { error } = await supabase.from(section.table).update(payload).eq("id", editingRow.id);
+      resultError = error;
+    }
+    setSaving(false);
+    if (resultError) { setError(resultError.message); return; }
+    setCreating(false);
+    setEditingRow(null);
+    load();
+  };
+
+  const handleDelete = async (row: any) => {
+    const label = row[section.titleField] || "este item";
+    if (!window.confirm('Tem certeza que deseja excluir "' + label + '"? Essa ação não pode ser desfeita.')) return;
+    const { error } = await supabase.from(section.table).delete().eq("id", row.id);
+    if (error) { setError(error.message); return; }
+    load();
+  };
+
+  const showForm = creating || editingRow;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-['Inter'] font-medium text-[24px] text-[#2e0e15]">{section.label}</h2>
+        {!showForm && (
+          <button onClick={startCreate} className="bg-[#9b2220] text-[#f3deb7] text-[12px] uppercase px-4 py-2 rounded-lg hover:bg-[#ca1419] transition-colors tracking-wide">
+            + Novo
+          </button>
+        )}
+      </div>
+
+      {error && <p className="text-[#9b2220] text-sm mb-4">{error}</p>}
+
+      {showForm ? (
+        <form onSubmit={handleSubmit} className="bg-white/60 p-6 mb-8 space-y-4">
+          {section.fields.map((f) => (
+            <div key={f.key}>
+              <label className="block text-[#2e0e15] text-[12px] font-medium mb-2 uppercase tracking-widest">{f.label}</label>
+              {f.type === "textarea" ? (
+                <textarea
+                  rows={4}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                  className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors resize-none"
+                />
+              ) : (
+                <input
+                  type={f.type === "number" ? "number" : "text"}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                  className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors"
+                />
+              )}
+            </div>
+          ))}
+          <div className="flex gap-3 pt-2">
+            <button type="submit" disabled={saving} className="bg-[#9b2220] text-[#f3deb7] text-[12px] uppercase px-5 py-3 rounded-lg hover:bg-[#ca1419] transition-colors tracking-wide disabled:opacity-60">
+              {saving ? "SALVANDO..." : "SALVAR"}
+            </button>
+            <button type="button" onClick={cancelForm} className="text-[#2e0e15] text-[12px] uppercase px-5 py-3 tracking-wide hover:text-[#9b2220] transition-colors">
+              CANCELAR
+            </button>
+          </div>
+        </form>
+      ) : null}
+
+      {loading ? (
+        <p className="text-[#2e0e15]">Carregando...</p>
+      ) : rows.length === 0 ? (
+        <p className="text-[#2e0e15]/70">Nenhum item cadastrado ainda.</p>
+      ) : (
+        <div className="space-y-2">
+          {rows.map((row) => (
+            <div key={row.id} className="bg-white/60 px-5 py-4 flex items-center justify-between gap-4">
+              <span className="text-[#2e0e15] text-base truncate">{row[section.titleField]}</span>
+              <div className="flex gap-3 flex-shrink-0">
+                <button onClick={() => startEdit(row)} className="text-[#9b2220] text-[12px] uppercase font-bold underline tracking-wide hover:text-[#ca1419] transition-colors">
+                  Editar
+                </button>
+                <button onClick={() => handleDelete(row)} className="text-[#2e0e15] text-[12px] uppercase font-bold underline tracking-wide hover:text-[#9b2220] transition-colors">
+                  Excluir
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminDashboard({ onNavigate, onChangePassword }: { onNavigate: (p: Page) => void; onChangePassword: () => void }) {
+  const [activeSection, setActiveSection] = useState(ADMIN_SECTIONS[0].key);
+  const section = ADMIN_SECTIONS.find((s) => s.key === activeSection) || ADMIN_SECTIONS[0];
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  return (
+    <div className="bg-[#fbdfb5] min-h-[70vh]">
+      <div className="max-w-[1440px] mx-auto px-10 py-10 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-10">
+        <aside>
+          <p className="text-[12px] uppercase text-[#9b2220] mb-4 tracking-widest font-medium">Painel Admin</p>
+          <nav className="flex lg:flex-col gap-2 flex-wrap mb-8">
+            {ADMIN_SECTIONS.map((s) => (
+              <button
+                key={s.key}
+                onClick={() => setActiveSection(s.key)}
+                className={
+                  activeSection === s.key
+                    ? "text-left text-[13px] uppercase px-4 py-2 tracking-wide transition-colors bg-[#9b2220] text-[#f3e0b7]"
+                    : "text-left text-[13px] uppercase px-4 py-2 tracking-wide transition-colors bg-[#2e0e15]/10 text-[#2e0e15] hover:bg-[#9b2220] hover:text-[#f3e0b7]"
+                }
+              >
+                {s.label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex flex-col gap-2 border-t border-[#2e0e15]/20 pt-4">
+            <button onClick={() => onNavigate("home")} className="text-left text-[12px] uppercase text-[#2e0e15] hover:text-[#9b2220] transition-colors tracking-wide">
+              ← Ver site
+            </button>
+            <button onClick={onChangePassword} className="text-left text-[12px] uppercase text-[#2e0e15] hover:text-[#9b2220] transition-colors tracking-wide">
+              Trocar senha
+            </button>
+            <button onClick={handleLogout} className="text-left text-[12px] uppercase text-[#2e0e15] hover:text-[#9b2220] transition-colors tracking-wide">
+              Sair
+            </button>
+          </div>
+        </aside>
+        <div>
+          <AdminTable key={section.key} section={section} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PageAdmin({ onNavigate }: { onNavigate: (p: Page) => void }) {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [showSetPassword, setShowSetPassword] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
+      if (window.location.hash.includes("type=invite") || window.location.hash.includes("type=recovery")) {
+        setShowSetPassword(true);
+      }
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, newSession) => {
+      setSession(newSession);
+      if (event === "PASSWORD_RECOVERY") {
+        setShowSetPassword(true);
+      }
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (loading) {
+    return <div className="bg-[#2b0101] text-[#f3e0b7] min-h-[60vh] flex items-center justify-center">Carregando...</div>;
+  }
+
+  if (!session) {
+    return <AdminLogin />;
+  }
+
+  if (showSetPassword) {
+    return (
+      <AdminSetPassword
+        onDone={() => {
+          setShowSetPassword(false);
+          window.history.replaceState(null, "", window.location.pathname);
+        }}
+      />
+    );
+  }
+
+  return <AdminDashboard onNavigate={onNavigate} onChangePassword={() => setShowSetPassword(true)} />;
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -1783,6 +2205,7 @@ export default function App() {
       case "atelie":           return <PageAtelie onNavigate={navigate} />;
       case "atelie-inscricao": return <PageAtelieInscricao onNavigate={navigate} />;
       case "contato":          return <PageContato />;
+      case "admin": return <PageAdmin onNavigate={navigate} />;
     }
   };
 
