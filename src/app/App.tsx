@@ -2182,7 +2182,12 @@ function PageAdmin({ onNavigate }: { onNavigate: (p: Page) => void }) {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>("home");
+  const [currentPage, setCurrentPage] = useState<Page>(() => {
+    if (typeof window !== "undefined" && (window.location.hash.includes("type=invite") || window.location.hash.includes("type=recovery") || window.location.hash.includes("access_token"))) {
+      return "admin";
+    }
+    return "home";
+  });
 
   const navigate = (page: Page) => {
     setCurrentPage(page);
