@@ -34,6 +34,8 @@ type Page =
   | "contato"
   | "admin";
 
+type NavigateFn = (page: Page, id?: string | number) => void;
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const NAV_LINKS: { label: string; page: Page }[] = [
@@ -566,7 +568,7 @@ function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {NOTICIAS_ITEMS.slice(0, 3).map((item) => (
               <button
                 key={item.id}
-                onClick={() => onNavigate("noticia-item")}
+                onClick={() => onNavigate("noticia-item", item.id)}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[256px] overflow-hidden">
@@ -776,7 +778,7 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {filtered.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onNavigate("acervo-item")}
+                onClick={() => onNavigate("acervo-item", item.id)}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[200px] overflow-hidden relative">
@@ -799,9 +801,9 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
   );
 }
 
-function PageAcervoItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
   const ACERVO_ITEMS = useCordeis();
-const item = ACERVO_ITEMS[0];
+  const item = ACERVO_ITEMS.find((i) => i.id === selectedId) ?? ACERVO_ITEMS[0];
     if (!item) {
           return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
     }
@@ -876,7 +878,7 @@ const item = ACERVO_ITEMS[0];
             {ACERVO_ITEMS.slice(1, 4).map((relItem) => (
               <button
                 key={relItem.id}
-                onClick={() => onNavigate("acervo-item")}
+                onClick={() => onNavigate("acervo-item", relItem.id)}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[160px] overflow-hidden">
@@ -965,7 +967,7 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {filtered.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onNavigate("biblioteca-item")}
+                onClick={() => onNavigate("biblioteca-item", item.id)}
                 className="bg-[#a7922c] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] group"
               >
                 <div className="h-[200px] overflow-hidden relative">
@@ -990,9 +992,9 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
   );
 }
 
-function PageBibliotecaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageBibliotecaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
 const BIBLIOTECA_ITEMS = useLivros();
-    const item = BIBLIOTECA_ITEMS[0];
+    const item = BIBLIOTECA_ITEMS.find((i) => i.id === selectedId) ?? BIBLIOTECA_ITEMS[0];
     if (!item) {
     return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
     }
@@ -1059,7 +1061,7 @@ const BIBLIOTECA_ITEMS = useLivros();
             {BIBLIOTECA_ITEMS.slice(1, 5).map((b) => (
               <button
                 key={b.id}
-                onClick={() => onNavigate("biblioteca-item")}
+                onClick={() => onNavigate("biblioteca-item", b.id)}
                 className="bg-[#a7922c] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] group"
               >
                 <div className="h-[160px]">
@@ -1124,7 +1126,7 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {filtered.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onNavigate("noticia-item")}
+                onClick={() => onNavigate("noticia-item", item.id)}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[200px] overflow-hidden relative">
@@ -1148,8 +1150,8 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
   );
 }
 
-function PageNoticiaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
+  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => i.id === selectedId) ?? NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1194,7 +1196,7 @@ function PageNoticiaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {NOTICIAS_ITEMS.slice(1, 4).map((n) => (
               <button
                 key={n.id}
-                onClick={() => onNavigate("noticia-item")}
+                onClick={() => onNavigate("noticia-item", n.id)}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[160px] overflow-hidden">
@@ -1239,7 +1241,7 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
             {ENTREVISTAS_ITEMS.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onNavigate("entrevista-item")}
+                onClick={() => onNavigate("entrevista-item", item.id)}
                 className="bg-[#3f0a0e] overflow-hidden group hover:bg-[#4a0e12] transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244]"
               >
                 <div className="relative h-[240px] overflow-hidden">
@@ -1270,8 +1272,8 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
   );
 }
 
-function PageEntrevistaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
+  const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => i.id === selectedId) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1341,7 +1343,7 @@ function PageEntrevistaItem({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {ENTREVISTAS_ITEMS.slice(1, 4).map((e) => (
               <button
                 key={e.id}
-                onClick={() => onNavigate("entrevista-item")}
+                onClick={() => onNavigate("entrevista-item", e.id)}
                 className="bg-[#2e0e15] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244] group"
               >
                 <div className="relative h-[180px] overflow-hidden">
@@ -1482,7 +1484,7 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
                   <div className="flex items-center justify-between">
                     <span className="text-[#ffb928] text-[12px] uppercase tracking-wide font-medium">{w.spots}</span>
                     <button
-                      onClick={() => onNavigate("atelie-inscricao")}
+                      onClick={() => onNavigate("atelie-inscricao", w.id)}
                       className="text-[#f3e0b7] text-[12px] font-bold underline hover:text-[#ffb928] transition-colors uppercase tracking-wide"
                     >
                       INSCREVER-SE
@@ -1516,13 +1518,30 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
   );
 }
 
-function PageAtelieInscricao({ onNavigate }: { onNavigate: (p: Page) => void }) {
-  const workshops = useWorkshops(); const workshop = workshops[0]; if (!workshop) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
+  const workshops = useWorkshops(); const workshop = workshops.find((w) => w.id === selectedId) ?? workshops[0]; if (!workshop) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    setError("");
+    const { error: submitError } = await supabase.from("inscricoes_workshops").insert({
+      workshop_id: workshop.id,
+      workshop_titulo: workshop.title,
+      nome: form.name,
+      email: form.email,
+      telefone: form.phone,
+      mensagem: form.message,
+    });
+    setSaving(false);
+    if (submitError) {
+      setError("Não foi possível enviar sua inscrição. Tente novamente em instantes.");
+      return;
+    }
     setSent(true);
   };
 
@@ -1636,11 +1655,13 @@ function PageAtelieInscricao({ onNavigate }: { onNavigate: (p: Page) => void }) 
                       className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors placeholder-[#2e0e15]/40 resize-none"
                     />
                   </div>
+                  {error && <p className="text-[#2e0e15] text-sm">{error}</p>}
                   <button
                     type="submit"
-                    className="w-full bg-[#9b2220] text-[#f3deb7] text-base uppercase py-4 rounded-lg hover:bg-[#ca1419] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] tracking-wide"
+                    disabled={saving}
+                    className="w-full bg-[#9b2220] text-[#f3deb7] text-base uppercase py-4 rounded-lg hover:bg-[#ca1419] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] tracking-wide disabled:opacity-60"
                   >
-                    ENVIAR INSCRIÇÃO
+                    {saving ? "ENVIANDO..." : "ENVIAR INSCRIÇÃO"}
                   </button>
                   <p className="text-[#2e0e15]/60 text-[12px] text-center">
                     Ao enviar, você concorda com o contato da equipe LabSul para confirmação da vaga.
@@ -1658,9 +1679,24 @@ function PageAtelieInscricao({ onNavigate }: { onNavigate: (p: Page) => void }) 
 function PageContato() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    setError("");
+    const { error: submitError } = await supabase.from("mensagens_contato").insert({
+      nome: form.name,
+      email: form.email,
+      assunto: form.subject,
+      mensagem: form.message,
+    });
+    setSaving(false);
+    if (submitError) {
+      setError("Não foi possível enviar sua mensagem. Tente novamente em instantes.");
+      return;
+    }
     setSent(true);
   };
 
@@ -1713,8 +1749,9 @@ function PageContato() {
                     <label htmlFor="cnt-message" className="block text-[#2e0e15] text-[12px] font-medium mb-2 uppercase tracking-widest">Mensagem</label>
                     <textarea id="cnt-message" rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors placeholder-[#2e0e15]/40 resize-none" placeholder="Sua mensagem..." />
                   </div>
-                  <button type="submit" className="w-full bg-[#9b2220] text-[#f3deb7] text-base uppercase py-4 rounded-lg hover:bg-[#ca1419] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] tracking-wide">
-                    ENVIAR MENSAGEM
+                  {error && <p className="text-[#9b2220] text-sm">{error}</p>}
+                  <button type="submit" disabled={saving} className="w-full bg-[#9b2220] text-[#f3deb7] text-base uppercase py-4 rounded-lg hover:bg-[#ca1419] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] tracking-wide disabled:opacity-60">
+                    {saving ? "ENVIANDO..." : "ENVIAR MENSAGEM"}
                   </button>
                 </form>
               )}
@@ -1761,9 +1798,9 @@ function PageContato() {
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
-type AdminFieldType = "text" | "number" | "textarea" | "tags";
+type AdminFieldType = "text" | "number" | "textarea" | "tags" | "image";
 type AdminField = { key: string; label: string; type: AdminFieldType };
-type AdminSection = { key: string; label: string; table: string; titleField: string; fields: AdminField[] };
+type AdminSection = { key: string; label: string; table: string; titleField: string; fields: AdminField[]; mode?: "manage" | "view" };
 
 const ADMIN_SECTIONS: AdminSection[] = [
   {
@@ -1778,7 +1815,7 @@ const ADMIN_SECTIONS: AdminSection[] = [
       { key: "origem", label: "Origem", type: "text" },
       { key: "autor", label: "Autor", type: "text" },
       { key: "descricao", label: "Descrição", type: "textarea" },
-      { key: "imagem_url", label: "URL da imagem", type: "text" },
+      { key: "imagem_url", label: "Imagem", type: "image" },
     ],
   },
   {
@@ -1792,7 +1829,7 @@ const ADMIN_SECTIONS: AdminSection[] = [
       { key: "autor", label: "Autor", type: "text" },
       { key: "ano", label: "Ano", type: "number" },
       { key: "descricao", label: "Descrição", type: "textarea" },
-      { key: "imagem_url", label: "URL da imagem", type: "text" },
+      { key: "imagem_url", label: "Imagem", type: "image" },
     ],
   },
   {
@@ -1805,7 +1842,7 @@ const ADMIN_SECTIONS: AdminSection[] = [
       { key: "categoria", label: "Categoria", type: "text" },
       { key: "data_publicacao", label: "Data de publicação", type: "text" },
       { key: "resumo", label: "Resumo", type: "textarea" },
-      { key: "imagem_url", label: "URL da imagem", type: "text" },
+      { key: "imagem_url", label: "Imagem", type: "image" },
     ],
   },
   {
@@ -1821,7 +1858,7 @@ const ADMIN_SECTIONS: AdminSection[] = [
       { key: "tags", label: "Tags (separadas por vírgula)", type: "tags" },
       { key: "resumo", label: "Resumo", type: "textarea" },
       { key: "conteudo", label: "Conteúdo", type: "textarea" },
-      { key: "imagem_url", label: "URL da imagem", type: "text" },
+      { key: "imagem_url", label: "Imagem", type: "image" },
     ],
   },
   {
@@ -1837,8 +1874,37 @@ const ADMIN_SECTIONS: AdminSection[] = [
       { key: "duracao", label: "Duração", type: "text" },
       { key: "horario", label: "Horário", type: "text" },
       { key: "local", label: "Local", type: "text" },
-      { key: "imagem_url", label: "URL da imagem", type: "text" },
+      { key: "imagem_url", label: "Imagem", type: "image" },
       { key: "descricao", label: "Descrição", type: "textarea" },
+    ],
+  },
+  {
+    key: "mensagens_contato",
+    label: "Contato",
+    table: "mensagens_contato",
+    titleField: "nome",
+    mode: "view",
+    fields: [
+      { key: "nome", label: "Nome", type: "text" },
+      { key: "email", label: "E-mail", type: "text" },
+      { key: "assunto", label: "Assunto", type: "text" },
+      { key: "mensagem", label: "Mensagem", type: "textarea" },
+      { key: "criado_em", label: "Recebido em", type: "text" },
+    ],
+  },
+  {
+    key: "inscricoes_workshops",
+    label: "Inscrições Ateliê",
+    table: "inscricoes_workshops",
+    titleField: "nome",
+    mode: "view",
+    fields: [
+      { key: "nome", label: "Nome", type: "text" },
+      { key: "email", label: "E-mail", type: "text" },
+      { key: "telefone", label: "Telefone", type: "text" },
+      { key: "workshop_titulo", label: "Oficina", type: "text" },
+      { key: "mensagem", label: "Mensagem", type: "textarea" },
+      { key: "criado_em", label: "Recebido em", type: "text" },
     ],
   },
 ];
@@ -1928,6 +1994,7 @@ function AdminTable({ section }: { section: AdminSection }) {
   const [form, setForm] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -1967,6 +2034,23 @@ function AdminTable({ section }: { section: AdminSection }) {
     setEditingRow(null);
     setCreating(false);
     setError("");
+  };
+
+  const handleImageUpload = async (fieldKey: string, file: File | null) => {
+    if (!file) return;
+    setUploadingField(fieldKey);
+    setError("");
+    const ext = file.name.split(".").pop();
+    const path = `${section.table}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("imagens").upload(path, file, { upsert: true });
+    if (uploadError) {
+      setUploadingField(null);
+      setError("Não foi possível enviar a imagem: " + uploadError.message);
+      return;
+    }
+    const { data } = supabase.storage.from("imagens").getPublicUrl(path);
+    setForm((prev: Record<string, any>) => ({ ...prev, [fieldKey]: data.publicUrl }));
+    setUploadingField(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -2016,7 +2100,7 @@ function AdminTable({ section }: { section: AdminSection }) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-['Inter'] font-medium text-[24px] text-[#2e0e15]">{section.label}</h2>
-        {!showForm && (
+        {!showForm && section.mode !== "view" && (
           <button onClick={startCreate} className="bg-[#9b2220] text-[#f3deb7] text-[12px] uppercase px-4 py-2 rounded-lg hover:bg-[#ca1419] transition-colors tracking-wide">
             + Novo
           </button>
@@ -2037,6 +2121,19 @@ function AdminTable({ section }: { section: AdminSection }) {
                   onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
                   className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors resize-none"
                 />
+              ) : f.type === "image" ? (
+                <div className="space-y-3">
+                  {form[f.key] ? (
+                    <img src={form[f.key]} alt="" className="h-32 w-32 object-cover border-2 border-[#2e0e15]" />
+                  ) : null}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(f.key, e.target.files?.[0] || null)}
+                    className="w-full border-2 border-[#2e0e15] bg-transparent px-4 py-3 text-base text-[#2e0e15] outline-none focus:border-[#ca1419] transition-colors"
+                  />
+                  {uploadingField === f.key && <p className="text-[#2e0e15] text-[12px]">Enviando imagem...</p>}
+                </div>
               ) : (
                 <input
                   type={f.type === "number" ? "number" : "text"}
@@ -2066,11 +2163,24 @@ function AdminTable({ section }: { section: AdminSection }) {
         <div className="space-y-2">
           {rows.map((row) => (
             <div key={row.id} className="bg-white/60 px-5 py-4 flex items-center justify-between gap-4">
-              <span className="text-[#2e0e15] text-base truncate">{row[section.titleField]}</span>
+              {section.mode === "view" ? (
+                <div className="flex-1 min-w-0">
+                  <p className="text-[#2e0e15] text-base font-medium truncate">{row[section.titleField]}</p>
+                  <div className="text-[#2e0e15]/70 text-[12px] mt-1 space-y-0.5">
+                    {section.fields.filter((f) => f.key !== section.titleField).map((f) => (
+                      row[f.key] ? <p key={f.key} className="truncate"><span className="font-medium">{f.label}:</span> {String(row[f.key])}</p> : null
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <span className="text-[#2e0e15] text-base truncate">{row[section.titleField]}</span>
+              )}
               <div className="flex gap-3 flex-shrink-0">
-                <button onClick={() => startEdit(row)} className="text-[#9b2220] text-[12px] uppercase font-bold underline tracking-wide hover:text-[#ca1419] transition-colors">
-                  Editar
-                </button>
+                {section.mode !== "view" && (
+                  <button onClick={() => startEdit(row)} className="text-[#9b2220] text-[12px] uppercase font-bold underline tracking-wide hover:text-[#ca1419] transition-colors">
+                    Editar
+                  </button>
+                )}
                 <button onClick={() => handleDelete(row)} className="text-[#2e0e15] text-[12px] uppercase font-bold underline tracking-wide hover:text-[#9b2220] transition-colors">
                   Excluir
                 </button>
@@ -2189,8 +2299,11 @@ export default function App() {
     return "home";
   });
 
-  const navigate = (page: Page) => {
+  const [selectedId, setSelectedId] = useState<string | number | null>(null);
+
+  const navigate = (page: Page, id?: string | number) => {
     setCurrentPage(page);
+    if (id !== undefined) setSelectedId(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -2199,16 +2312,16 @@ export default function App() {
       case "home":             return <PageHome onNavigate={navigate} />;
       case "sobre":            return <PageSobre onNavigate={navigate} />;
       case "acervo":           return <PageAcervo onNavigate={navigate} />;
-      case "acervo-item":      return <PageAcervoItem onNavigate={navigate} />;
+      case "acervo-item":      return <PageAcervoItem onNavigate={navigate} selectedId={selectedId ?? undefined} />;
       case "biblioteca":       return <PageBiblioteca onNavigate={navigate} />;
-      case "biblioteca-item":  return <PageBibliotecaItem onNavigate={navigate} />;
+      case "biblioteca-item":  return <PageBibliotecaItem onNavigate={navigate} selectedId={selectedId ?? undefined} />;
       case "noticias":         return <PageNoticias onNavigate={navigate} />;
-      case "noticia-item":     return <PageNoticiaItem onNavigate={navigate} />;
+      case "noticia-item":     return <PageNoticiaItem onNavigate={navigate} selectedId={selectedId ?? undefined} />;
       case "entrevistas":      return <PageEntrevistas onNavigate={navigate} />;
-      case "entrevista-item":  return <PageEntrevistaItem onNavigate={navigate} />;
+      case "entrevista-item":  return <PageEntrevistaItem onNavigate={navigate} selectedId={selectedId ?? undefined} />;
       case "galeria":          return <PageGaleria />;
       case "atelie":           return <PageAtelie onNavigate={navigate} />;
-      case "atelie-inscricao": return <PageAtelieInscricao onNavigate={navigate} />;
+      case "atelie-inscricao": return <PageAtelieInscricao onNavigate={navigate} selectedId={selectedId ?? undefined} />;
       case "contato":          return <PageContato />;
       case "admin": return <PageAdmin onNavigate={navigate} />;
     }
