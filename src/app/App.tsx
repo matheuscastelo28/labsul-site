@@ -1519,12 +1519,12 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const workshops = useWorkshops(); const workshop = workshops.find((w) => w.id === selectedId) ?? workshops[0]; if (!workshop) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  const workshops = useWorkshops(); const workshop = workshops.find((w) => w.id === selectedId) ?? workshops[0];
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-
+  if (!workshop) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
