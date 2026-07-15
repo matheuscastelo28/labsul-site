@@ -141,6 +141,40 @@ function useEntrevistas() { const [items, setItems] = useState<any[]>([]); useEf
 
 function useWorkshops() { const [items, setItems] = useState<any[]>([]); useEffect(() => { let ativo = true; supabase.from("workshops").select("*").order("criado_em", { ascending: false }).then(({ data, error }) => { if (!ativo) return; if (error) { console.error("Erro ao buscar workshops no Supabase:", error.message); return; } if (data) { setItems(data.map((row) => ({ id: row.id, title: row.titulo, dates: row.datas, level: row.nivel, spots: row.vagas, duration: row.duracao, schedule: row.horario, local: row.local, img: row.imagem_url, desc: row.descricao }))); } }); return () => { ativo = false; }; }, []); return items; }
 
+function useGaleria() {
+  const [items, setItems] = useState<any[]>([]);
+  useEffect(() => {
+    let ativo = true;
+    supabase
+      .from("galeria")
+      .select("*")
+      .order("criado_em", { ascending: false })
+      .then(({ data, error }) => {
+        if (!ativo) return;
+        if (error) {
+          console.error("Erro ao buscar galeria no Supabase:", error.message);
+          return;
+        }
+        if (data) {
+          setItems(
+            data.map((row) => ({
+              id: row.id,
+              title: row.titulo,
+              category: row.categoria,
+              img: row.imagem_url,
+            }))
+          );
+        }
+      });
+    return () => {
+      ativo = false;
+    };
+  }, []);
+  return items;
+}
+
+const GALERIA_CATEGORIES = ["Todas", "Exposições", "Oficinas", "Eventos", "Acervo"];
+
 // ─── Shared Components ────────────────────────────────────────────────────────
 
 function Logo({ fill = "black" }: { fill?: string }) {
@@ -1369,10 +1403,10 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
 }
 
 function PageGaleria() {
-  const images: (string | null)[] = [imgHero, imgNews, imgP1, imgP2, imgP3, imgP4, imgP5, null, imgHero, imgP3, null, imgP5];
-  const categories = ["Todas", "Exposições", "Oficinas", "Eventos", "Acervo"];
+  const items = useGaleria();
   const [activeFilter, setActiveFilter] = useState("Todas");
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const filtered = activeFilter === "Todas" ? items : items.filter((it: any) => it.category === activeFilter);
 
   return (
     <div className="bg-[#2b0101]">
@@ -1388,8 +1422,8 @@ function PageGaleria() {
 
       <section className="bg-[#2b0101] py-10">
         <div className="max-w-[1440px] mx-auto px-10">
-          <div className="flex flex-wrap gap-2 mb-10">
-            {categories.map((cat) => (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {GALERIA_CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
@@ -1404,25 +1438,28 @@ function PageGaleria() {
             ))}
           </div>
 
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
-            {images.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => { if (img) setLightbox(i); }}
-                className="block w-full overflow-hidden bg-[#3f0a0e] group break-inside-avoid focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d75f85]"
-                style={{ height: i % 3 === 0 ? "280px" : "180px" }}
-              >
-                {img
-                  ? <img src={img} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
-                  : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
-                }
-              </button>
-            ))}
-          </div>
+          {filtered.length === 0 ? (
+            <p className="text-[#f3d7af] text-sm">Nenhuma imagem cadastrada nesta categoria ainda.</p>
+          ) : (
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-2 space-y-2">
+              {filtered.map((item: any, i: number) => (
+                <button
+                  key={item.id ?? i}
+                  onClick={() => { if (item.img) setLightbox(i); }}
+                  className="block w-full overflow-hidden bg-[#3f0a0e] group break-inside-avoid focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d75f85]"
+                >
+                  {item.img
+                    ? <img src={item.img} alt={item.title ?? ""} className="w-full h-auto group-hover:scale-105 transition-all duration-500" />
+                    : <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  }
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {lightbox !== null && images[lightbox] && (
+      {lightbox !== null && filtered[lightbox] && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
           <button
             className="absolute top-6 right-6 text-white p-2 hover:text-[#ffb928] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928]"
@@ -1431,7 +1468,7 @@ function PageGaleria() {
           >
             <X size={32} />
           </button>
-          <img src={images[lightbox]!} alt="" className="max-w-full max-h-[80vh] object-contain" onClick={(e) => e.stopPropagation()} />
+          <img src={filtered[lightbox].img} alt="" className="max-w-full max-h-[80vh] object-contain" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
     </div>
@@ -1876,6 +1913,17 @@ const ADMIN_SECTIONS: AdminSection[] = [
       { key: "local", label: "Local", type: "text" },
       { key: "imagem_url", label: "Imagem", type: "image" },
       { key: "descricao", label: "Descrição", type: "textarea" },
+    ],
+  },
+  {
+    key: "galeria",
+    label: "Galeria",
+    table: "galeria",
+    titleField: "titulo",
+    fields: [
+      { key: "titulo", label: "Título", type: "text" },
+      { key: "categoria", label: "Categoria", type: "text" },
+      { key: "imagem_url", label: "Imagem", type: "image" },
     ],
   },
   {
