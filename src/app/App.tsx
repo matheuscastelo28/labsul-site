@@ -668,6 +668,9 @@ function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageSobre({ onNavigate }: { onNavigate: (p: Page) => void }) {
+    const cordeisSobre = useCordeis();
+    const entrevistasSobre = useEntrevistas();
+    const workshopsSobre = useWorkshops();
   return (
     <div className="bg-[#2b0101]">
       {/* Hero */}
@@ -705,9 +708,9 @@ function PageSobre({ onNavigate }: { onNavigate: (p: Page) => void }) {
             <div className="grid grid-cols-2 gap-px bg-[#2e0e15]">
               {[
                 { num: "12+", label: "anos de atuação", bg: "bg-[#a7922c]", text: "text-[#2e0e15]" },
-                { num: "3.400", label: "itens no acervo", bg: "bg-[#d65e84]", text: "text-[#2e0e15]" },
-                { num: "80+", label: "oficinas realizadas", bg: "bg-[#9b2220]", text: "text-[#f3e0b7]" },
-                { num: "200", label: "entrevistas gravadas", bg: "bg-[#d9b244]", text: "text-[#2e0e15]" },
+      { num: String(cordeisSobre.length), label: "itens no acervo", bg: "bg-[#d65e84]", text: "text-[#2e0e15]" },
+      { num: String(workshopsSobre.length), label: "oficinas realizadas", bg: "bg-[#9b2220]", text: "text-[#f3e0b7]" },
+      { num: String(entrevistasSobre.length), label: "entrevistas gravadas", bg: "bg-[#d9b244]", text: "text-[#2e0e15]" },
               ].map((item) => (
                 <div key={item.label} className={`${item.bg} p-8`}>
                   <p className={`text-[48px] font-semibold ${item.text} leading-none mb-2`}>{item.num}</p>
@@ -807,7 +810,7 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
             Acervo Digital
           </h1>
           <p className="text-[#f3d7af] text-xl mt-4 max-w-lg">
-            Mais de 3.400 itens catalogados da cultura popular nordestina
+                        Mais de {ACERVO_ITEMS.length} itens catalogados da cultura popular nordestina
           </p>
         </div>
         <div className="absolute right-0 top-0 bottom-0 w-[183px] hidden xl:block bg-[#94231f] overflow-hidden pointer-events-none">
