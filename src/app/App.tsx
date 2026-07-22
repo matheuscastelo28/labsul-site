@@ -1346,8 +1346,7 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
 }
 
 function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
-    const [showComingSoon, setShowComingSoon] = useState(false);
+    const [showComingSoon, setShowComingSoon] = useState(false); const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
