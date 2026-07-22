@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { Menu, X, Play, ChevronRight, Mail, Phone, MapPin } from "lucide-react";
 
@@ -35,6 +36,49 @@ type Page =
   | "admin";
 
 type NavigateFn = (page: Page, id?: string | number) => void;
+
+function pageToPath(page: Page, id?: string | number): string {
+  switch (page) {
+    case "home": return "/";
+    case "sobre": return "/sobre";
+    case "acervo": return "/acervo";
+    case "acervo-item": return "/acervo/" + (id ?? "");
+    case "biblioteca": return "/biblioteca";
+    case "biblioteca-item": return "/biblioteca/" + (id ?? "");
+    case "noticias": return "/noticias";
+    case "noticia-item": return "/noticias/" + (id ?? "");
+    case "entrevistas": return "/entrevistas";
+    case "entrevista-item": return "/entrevistas/" + (id ?? "");
+    case "galeria": return "/galeria";
+    case "atelie": return "/atelie";
+    case "atelie-inscricao": return "/atelie/inscricao/" + (id ?? "");
+    case "contato": return "/contato";
+    case "admin": return "/admin";
+    default: return "/";
+  }
+}
+
+function pathToPage(pathname: string): { page: Page; id?: string } {
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length === 0) return { page: "home" };
+  const first = parts[0];
+  const second = parts[1];
+  const third = parts[2];
+  if (first === "sobre") return { page: "sobre" };
+  if (first === "acervo") return second ? { page: "acervo-item", id: second } : { page: "acervo" };
+  if (first === "biblioteca") return second ? { page: "biblioteca-item", id: second } : { page: "biblioteca" };
+  if (first === "noticias") return second ? { page: "noticia-item", id: second } : { page: "noticias" };
+  if (first === "entrevistas") return second ? { page: "entrevista-item", id: second } : { page: "entrevistas" };
+  if (first === "galeria") return { page: "galeria" };
+  if (first === "atelie") {
+    if (second === "inscricao" && third) return { page: "atelie-inscricao", id: third };
+    return { page: "atelie" };
+  }
+  if (first === "contato") return { page: "contato" };
+  if (first === "admin") return { page: "admin" };
+  return { page: "home" };
+}
+
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -74,6 +118,7 @@ function useCordeis() {
                                                                 category: row.categoria,
                                                                 year: row.ano ? String(row.ano) : "",
                                                                 origin: row.origem,
+                                                  author: row.autor, desc: row.descricao,
                                                                 img: row.imagem_url,
                                                 }))
                                               );
@@ -623,6 +668,9 @@ function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageSobre({ onNavigate }: { onNavigate: (p: Page) => void }) {
+    const cordeisSobre = useCordeis();
+    const entrevistasSobre = useEntrevistas();
+    const workshopsSobre = useWorkshops();
   return (
     <div className="bg-[#2b0101]">
       {/* Hero */}
@@ -660,9 +708,9 @@ function PageSobre({ onNavigate }: { onNavigate: (p: Page) => void }) {
             <div className="grid grid-cols-2 gap-px bg-[#2e0e15]">
               {[
                 { num: "12+", label: "anos de atuação", bg: "bg-[#a7922c]", text: "text-[#2e0e15]" },
-                { num: "3.400", label: "itens no acervo", bg: "bg-[#d65e84]", text: "text-[#2e0e15]" },
-                { num: "80+", label: "oficinas realizadas", bg: "bg-[#9b2220]", text: "text-[#f3e0b7]" },
-                { num: "200", label: "entrevistas gravadas", bg: "bg-[#d9b244]", text: "text-[#2e0e15]" },
+      { num: String(cordeisSobre.length), label: "itens no acervo", bg: "bg-[#d65e84]", text: "text-[#2e0e15]" },
+      { num: String(workshopsSobre.length), label: "oficinas realizadas", bg: "bg-[#9b2220]", text: "text-[#f3e0b7]" },
+      { num: String(entrevistasSobre.length), label: "entrevistas gravadas", bg: "bg-[#d9b244]", text: "text-[#2e0e15]" },
               ].map((item) => (
                 <div key={item.label} className={`${item.bg} p-8`}>
                   <p className={`text-[48px] font-semibold ${item.text} leading-none mb-2`}>{item.num}</p>
@@ -762,7 +810,7 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
             Acervo Digital
           </h1>
           <p className="text-[#f3d7af] text-xl mt-4 max-w-lg">
-            Mais de 3.400 itens catalogados da cultura popular nordestina
+                        Mais de {ACERVO_ITEMS.length} itens catalogados da cultura popular nordestina
           </p>
         </div>
         <div className="absolute right-0 top-0 bottom-0 w-[183px] hidden xl:block bg-[#94231f] overflow-hidden pointer-events-none">
@@ -837,7 +885,7 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
   const ACERVO_ITEMS = useCordeis();
-  const item = ACERVO_ITEMS.find((i) => i.id === selectedId) ?? ACERVO_ITEMS[0];
+    const item = ACERVO_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ACERVO_ITEMS[0];
     if (!item) {
           return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
     }
@@ -857,40 +905,31 @@ function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; se
         <div className="max-w-[1440px] mx-auto px-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <div>
-              <div className="bg-[#9b2220] p-2">
-                <img src={imgHero} alt="Xilogravura" className="w-full object-cover" style={{ maxHeight: "600px" }} />
-              </div>
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {[imgNews, imgP4, imgP2, imgP3].map((img, i) => (
-                  <div key={i} className="bg-[#3f0a0e] h-20 overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
-                    <img src={img} alt="" className="w-full h-full object-cover opacity-70" />
-                  </div>
-                ))}
-              </div>
+                            <div className="bg-[#9b2220] p-2">
+                              {item.img ? (
+                            <img src={item.img} alt={item.title} className="w-full object-cover" style={{ maxHeight: "600px" }} />
+                          ) : (
+                            <ImgPlaceholder className="w-full h-[420px]" label="imagem em breve" />
+                          )}
+                            </div>
             </div>
             <div>
               <Tag label={item.category} />
-              <h1 className="font-['Inter'] font-semibold text-[40px] text-[#f3e0b7] leading-tight mt-4 mb-6">
-                Lampião e Maria Bonita
-              </h1>
+                          <h1 className="font-['Inter'] font-semibold text-[40px] text-[#f3e0b7] leading-tight mt-4 mb-6">{item.title}</h1>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
-                  { label: "Ano", value: "1980" },
-                  { label: "Origem", value: "Juazeiro do Norte, CE" },
-                  { label: "Artista", value: "Mestre João Borges" },
-                  { label: "Técnica", value: "Xilogravura em madeira" },
-                  { label: "Dimensões", value: "30 × 45 cm" },
-                  { label: "Coleção", value: "Acervo LabSul" },
-                ].map((field) => (
+          { label: "Ano", value: item.year || "—" },
+          { label: "Origem", value: item.origin || "—" },
+          { label: "Artista", value: item.author || "—" },
+          { label: "Coleção", value: "Acervo LabSul" },
+                          ].map((field) => (
                   <div key={field.label} className="border-b border-[#3f0a0e] pb-3">
                     <p className="text-[#f53c25] text-[11px] uppercase tracking-wide">{field.label}</p>
                     <p className="text-[#f3e0b7] text-base mt-1">{field.value}</p>
                   </div>
                 ))}
               </div>
-              <p className="text-[#f3d7af] text-base leading-relaxed mb-8">
-                Obra representativa da tradição xilogravurista do Nordeste, esta peça retrata os lendários cangaceiros Lampião e Maria Bonita em linguagem gráfica típica, com linhas expressivas e composição frontal característica dos mestres de Juazeiro.
-              </p>
+                        <p className="text-[#f3d7af] text-base leading-relaxed mb-8">{item.desc || "Descrição em breve."}</p>
               <div className="flex flex-wrap gap-4">
                 <BtnPrimary className="text-sm">SOLICITAR ACESSO</BtnPrimary>
                 <button className="border border-[#f3e0b7] text-[#f3e0b7] uppercase text-sm px-6 py-3 rounded-lg hover:bg-[#f3e0b7]/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928]">
@@ -1028,7 +1067,7 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageBibliotecaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
 const BIBLIOTECA_ITEMS = useLivros();
-    const item = BIBLIOTECA_ITEMS.find((i) => i.id === selectedId) ?? BIBLIOTECA_ITEMS[0];
+        const item = BIBLIOTECA_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? BIBLIOTECA_ITEMS[0];
     if (!item) {
     return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
     }
@@ -1185,7 +1224,7 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => i.id === selectedId) ?? NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1307,7 +1346,7 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
 }
 
 function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => i.id === selectedId) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    const [showComingSoon, setShowComingSoon] = useState(false); const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1328,11 +1367,11 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
                 <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                 <div className="absolute inset-0 flex items-end justify-center pb-8">
                   <div className="bg-[#2b0101]/80 px-6 py-4 flex items-center gap-4 w-full mx-4">
-                    <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer">
+                                        <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer" onClick={() => setShowComingSoon(true)}>
                       <Play size={18} fill="white" className="text-white ml-0.5" />
                     </div>
                     <div>
-                      <p className="text-[#f3e0b7] text-[12px] uppercase tracking-wide font-medium">Reproduzir entrevista</p>
+                                          <p className="text-[#f3e0b7] text-[12px] uppercase tracking-wide font-medium">{showComingSoon ? "Conteúdo em breve" : "Reproduzir entrevista"}</p>
                       <p className="text-[#f3d7af] text-[11px]">{item.duration}</p>
                     </div>
                   </div>
@@ -1509,7 +1548,7 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {workshops.map((w) => (
               <div key={w.id} className="bg-[#9b2220] overflow-hidden flex flex-col sm:flex-row">
                 <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
-                  <img src={w.img} alt={w.title} className="w-full h-full object-cover opacity-70" />
+                  {w.img ? <img src={w.img} alt={w.title} className="w-full h-full object-cover opacity-70" /> : <ImgPlaceholder className="w-full h-full" label="imagem em breve" />}
                 </div>
                 <div className="p-6 flex flex-col justify-between gap-4">
                   <div>
@@ -1556,7 +1595,7 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const workshops = useWorkshops(); const workshop = workshops.find((w) => w.id === selectedId) ?? workshops[0];
+  const workshops = useWorkshops(); const workshop = workshops.find((w) => String(w.id) === String(selectedId)) ?? workshops[0];
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -2340,20 +2379,17 @@ function PageAdmin({ onNavigate }: { onNavigate: (p: Page) => void }) {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>(() => {
-    if (typeof window !== "undefined" && (window.location.hash.includes("type=invite") || window.location.hash.includes("type=recovery") || window.location.hash.includes("access_token"))) {
-      return "admin";
-    }
-    return "home";
-  });
+const location = useLocation();
+    const rrNavigate = useNavigate();
 
-  const [selectedId, setSelectedId] = useState<string | number | null>(null);
+    const isAuthRedirect = typeof window !== "undefined" && (window.location.hash.includes("type=invite") || window.location.hash.includes("type=recovery") || window.location.hash.includes("access_token"));
 
-  const navigate = (page: Page, id?: string | number) => {
-    setCurrentPage(page);
-    if (id !== undefined) setSelectedId(id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+    const { page: currentPage, id: selectedId } = isAuthRedirect ? { page: "admin" as Page, id: undefined as string | undefined } : pathToPage(location.pathname);
+
+    const navigate = (page: Page, id?: string | number) => {
+          rrNavigate(pageToPath(page, id));
+          window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
   const renderPage = () => {
     switch (currentPage) {
