@@ -1347,6 +1347,7 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
 
 function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
   const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    const [showComingSoon, setShowComingSoon] = useState(false);
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1367,11 +1368,11 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
                 <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                 <div className="absolute inset-0 flex items-end justify-center pb-8">
                   <div className="bg-[#2b0101]/80 px-6 py-4 flex items-center gap-4 w-full mx-4">
-                    <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer" onClick={() => alert("Conteúdo em breve")}>
+                                        <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer" onClick={() => setShowComingSoon(true)}>
                       <Play size={18} fill="white" className="text-white ml-0.5" />
                     </div>
                     <div>
-                      <p className="text-[#f3e0b7] text-[12px] uppercase tracking-wide font-medium">Reproduzir entrevista</p>
+                                          <p className="text-[#f3e0b7] text-[12px] uppercase tracking-wide font-medium">{showComingSoon ? "Conteúdo em breve" : "Reproduzir entrevista"}</p>
                       <p className="text-[#f3d7af] text-[11px]">{item.duration}</p>
                     </div>
                   </div>
