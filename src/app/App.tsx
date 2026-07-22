@@ -1064,7 +1064,7 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageBibliotecaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
 const BIBLIOTECA_ITEMS = useLivros();
-    const item = BIBLIOTECA_ITEMS.find((i) => i.id === selectedId) ?? BIBLIOTECA_ITEMS[0];
+        const item = BIBLIOTECA_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? BIBLIOTECA_ITEMS[0];
     if (!item) {
     return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
     }
@@ -1221,7 +1221,7 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => i.id === selectedId) ?? NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1343,7 +1343,7 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
 }
 
 function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => i.id === selectedId) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1364,7 +1364,7 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
                 <ImgPlaceholder className="w-full h-full" label="foto em breve" />
                 <div className="absolute inset-0 flex items-end justify-center pb-8">
                   <div className="bg-[#2b0101]/80 px-6 py-4 flex items-center gap-4 w-full mx-4">
-                    <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer">
+                    <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer" onClick={() => alert("Conteúdo em breve")}>
                       <Play size={18} fill="white" className="text-white ml-0.5" />
                     </div>
                     <div>
@@ -1545,7 +1545,7 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
             {workshops.map((w) => (
               <div key={w.id} className="bg-[#9b2220] overflow-hidden flex flex-col sm:flex-row">
                 <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
-                  <img src={w.img} alt={w.title} className="w-full h-full object-cover opacity-70" />
+                  {w.img ? <img src={w.img} alt={w.title} className="w-full h-full object-cover opacity-70" /> : <ImgPlaceholder className="w-full h-full" label="imagem em breve" />}
                 </div>
                 <div className="p-6 flex flex-col justify-between gap-4">
                   <div>
@@ -1592,7 +1592,7 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const workshops = useWorkshops(); const workshop = workshops.find((w) => w.id === selectedId) ?? workshops[0];
+  const workshops = useWorkshops(); const workshop = workshops.find((w) => String(w.id) === String(selectedId)) ?? workshops[0];
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [saving, setSaving] = useState(false);
