@@ -796,8 +796,8 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
   const filtered = ACERVO_ITEMS.filter((item) => {
       const matchCat = activeFilter === "Todos" || item.category === activeFilter;
     const matchSearch =
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.category.toLowerCase().includes(search.toLowerCase());
+      (item.title || "").toLowerCase().includes(search.toLowerCase()) ||
+      (item.category || "").toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
@@ -885,10 +885,20 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
   const ACERVO_ITEMS = useCordeis();
-    const item = ACERVO_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ACERVO_ITEMS[0];
+    const item = ACERVO_ITEMS.find((i) => String(i.id) === String(selectedId));
     if (!item) {
-          return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+          if (ACERVO_ITEMS.length === 0) {
+            return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+          }
+          return (
+            <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+              <p className="text-xl mb-6">Item não encontrado.</p>
+              <BtnPrimary onClick={() => onNavigate("acervo")}>VOLTAR PARA O ACERVO</BtnPrimary>
+            </div>
+          );
     }
+    const relatedAcervo = ACERVO_ITEMS.filter((i) => i.id !== item.id && i.category === item.category);
+    const acervoRelacionados = (relatedAcervo.length > 0 ? relatedAcervo : ACERVO_ITEMS.filter((i) => i.id !== item.id)).slice(0, 3);
     return (
         <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -946,9 +956,11 @@ function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; se
       <section className="bg-[#fbdfb5] py-16">
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[12px] uppercase text-[#9b2220] mb-4 tracking-widest font-medium">RELACIONADOS</p>
-          <h2 className="font-['Inter'] font-medium text-[32px] text-[#2e0e15] mb-8">Outros itens de Xilogravura</h2>
+          <h2 className="font-['Inter'] font-medium text-[32px] text-[#2e0e15] mb-8">
+            {relatedAcervo.length > 0 ? `Outros itens de ${item.category}` : "Outros itens do acervo"}
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {ACERVO_ITEMS.slice(1, 4).map((relItem) => (
+            {acervoRelacionados.map((relItem) => (
               <button
                 key={relItem.id}
                 onClick={() => onNavigate("acervo-item", relItem.id)}
@@ -978,8 +990,8 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
   const filtered = BIBLIOTECA_ITEMS.filter(
     (item) =>
       (activeType === "Todos" || item.type === activeType) &&
-      (item.title.toLowerCase().includes(search.toLowerCase()) ||
-        item.author.toLowerCase().includes(search.toLowerCase()))
+      ((item.title || "").toLowerCase().includes(search.toLowerCase()) ||
+        (item.author || "").toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -1067,10 +1079,19 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageBibliotecaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
 const BIBLIOTECA_ITEMS = useLivros();
-        const item = BIBLIOTECA_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? BIBLIOTECA_ITEMS[0];
+        const item = BIBLIOTECA_ITEMS.find((i) => String(i.id) === String(selectedId));
     if (!item) {
-    return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+    if (BIBLIOTECA_ITEMS.length === 0) {
+      return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
     }
+    return (
+      <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+        <p className="text-xl mb-6">Item não encontrado.</p>
+        <BtnPrimary onClick={() => onNavigate("biblioteca")}>VOLTAR PARA A BIBLIOTECA</BtnPrimary>
+      </div>
+    );
+    }
+    const bibliotecaRelacionados = BIBLIOTECA_ITEMS.filter((i) => i.id !== item.id).slice(0, 4);
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1131,7 +1152,7 @@ const BIBLIOTECA_ITEMS = useLivros();
           <p className="text-[12px] uppercase text-[#9b2220] mb-4 tracking-widest font-medium">RELACIONADOS</p>
           <h2 className="font-['Inter'] font-medium text-[32px] text-[#2e0e15] mb-8">Outros livros e materiais</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {BIBLIOTECA_ITEMS.slice(1, 5).map((b) => (
+            {bibliotecaRelacionados.map((b) => (
               <button
                 key={b.id}
                 onClick={() => onNavigate("biblioteca-item", b.id)}
@@ -1224,7 +1245,17 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => String(i.id) === String(selectedId));
+  if (!item) {
+    if (NOTICIAS_ITEMS.length === 0) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    return (
+      <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+        <p className="text-xl mb-6">Notícia não encontrada.</p>
+        <BtnPrimary onClick={() => onNavigate("noticias")}>VOLTAR PARA NOTÍCIAS</BtnPrimary>
+      </div>
+    );
+  }
+  const noticiasRelacionadas = NOTICIAS_ITEMS.filter((i) => i.id !== item.id).slice(0, 3);
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1266,7 +1297,7 @@ function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; s
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[#2b0101] text-[12px] uppercase mb-6 tracking-widest font-medium">OUTRAS NOTÍCIAS</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {NOTICIAS_ITEMS.slice(1, 4).map((n) => (
+            {noticiasRelacionadas.map((n) => (
               <button
                 key={n.id}
                 onClick={() => onNavigate("noticia-item", n.id)}
@@ -1346,7 +1377,17 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
 }
 
 function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-    const [showComingSoon, setShowComingSoon] = useState(false); const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    const [showComingSoon, setShowComingSoon] = useState(false); const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId));
+    if (!item) {
+      if (ENTREVISTAS_ITEMS.length === 0) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+      return (
+        <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+          <p className="text-xl mb-6">Entrevista não encontrada.</p>
+          <BtnPrimary onClick={() => onNavigate("entrevistas")}>VOLTAR PARA ENTREVISTAS</BtnPrimary>
+        </div>
+      );
+    }
+    const entrevistasRelacionadas = ENTREVISTAS_ITEMS.filter((i) => i.id !== item.id).slice(0, 3);
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1413,7 +1454,7 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[12px] uppercase text-[#2e0e15] mb-4 tracking-widest font-medium">OUTRAS ENTREVISTAS</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {ENTREVISTAS_ITEMS.slice(1, 4).map((e) => (
+            {entrevistasRelacionadas.map((e) => (
               <button
                 key={e.id}
                 onClick={() => onNavigate("entrevista-item", e.id)}
@@ -1595,12 +1636,20 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const workshops = useWorkshops(); const workshop = workshops.find((w) => String(w.id) === String(selectedId)) ?? workshops[0];
+  const workshops = useWorkshops(); const workshop = workshops.find((w) => String(w.id) === String(selectedId));
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  if (!workshop) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  if (!workshop) {
+    if (workshops.length === 0) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    return (
+      <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+        <p className="text-xl mb-6">Oficina não encontrada.</p>
+        <BtnPrimary onClick={() => onNavigate("atelie")}>VOLTAR PARA O ATELIÊ</BtnPrimary>
+      </div>
+    );
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -1644,7 +1693,11 @@ function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateF
               <h1 className="font-['Inter'] font-semibold text-[40px] text-[#2e0e15] leading-tight mb-6">{workshop.title}</h1>
 
               <div className="bg-[#9b2220] p-2 mb-8 overflow-hidden" style={{ maxWidth: "420px" }}>
-                <img src={workshop.img} alt={workshop.title} className="w-full object-cover opacity-80" style={{ maxHeight: "260px" }} />
+                {workshop.img ? (
+                  <img src={workshop.img} alt={workshop.title} className="w-full object-cover opacity-80" style={{ maxHeight: "260px" }} />
+                ) : (
+                  <ImgPlaceholder className="w-full h-[260px]" label="imagem em breve" />
+                )}
               </div>
 
               <p className="text-[#2f0f16] text-base leading-relaxed mb-8">{workshop.desc}</p>
