@@ -2222,8 +2222,14 @@ function AdminTable({ section }: { section: AdminSection }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
     setError("");
+    for (const f of section.fields) {
+      if (f.type === "number" && form[f.key] !== "" && Number.isNaN(Number(form[f.key]))) {
+        setError(`"${f.label}" precisa ser um número.`);
+        return;
+      }
+    }
+    setSaving(true);
     const payload: Record<string, any> = {};
     section.fields.forEach((f) => {
       if (f.type === "number") {
