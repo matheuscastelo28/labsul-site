@@ -651,7 +651,7 @@ function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[256px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                 </div>
                 <div className="p-6">
                   <p className="text-[#f3e0b7] text-[12px] mb-2">{item.date}</p>
@@ -864,7 +864,7 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  <ImgPlaceholder className="w-full h-full" label="imagem em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="imagem em breve" />}
                   <div className="absolute top-3 left-3">
                     <Tag label={item.category} />
                   </div>
@@ -955,7 +955,7 @@ function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; se
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[160px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="imagem em breve" />
+                  {relItem.img ? <img src={relItem.img} alt={relItem.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="imagem em breve" />}
                 </div>
                 <div className="p-4">
                   <p className="text-[#f3e0b7] text-base font-medium leading-snug">{relItem.title}</p>
@@ -1044,7 +1044,7 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#a7922c] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  <ImgPlaceholder className="w-full h-full" label="capa em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="capa em breve" />}
                   <div className="absolute top-3 left-3">
                     <span className="bg-[#2e0e15] text-[#f3d7af] text-[11px] uppercase px-2 py-0.5 tracking-wide">
                       {item.type}
@@ -1088,7 +1088,7 @@ const BIBLIOTECA_ITEMS = useLivros();
           <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-12 items-start">
             <div>
               <div className="bg-[#a7922c] p-2">
-                <ImgPlaceholder className="w-full h-[420px]" label="capa do livro" />
+                {item.img ? <img src={item.img} alt={item.title} className="w-full object-cover" style={{ maxHeight: "420px" }} /> : <ImgPlaceholder className="w-full h-[420px]" label="capa do livro" />}
               </div>
             </div>
             <div>
@@ -1138,7 +1138,7 @@ const BIBLIOTECA_ITEMS = useLivros();
                 className="bg-[#a7922c] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] group"
               >
                 <div className="h-[160px]">
-                  <ImgPlaceholder className="w-full h-full" label="capa em breve" />
+                  {b.img ? <img src={b.img} alt={b.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="capa em breve" />}
                 </div>
                 <div className="p-4">
                   <p className="text-[#2e0e15] text-base font-medium leading-snug">{b.title}</p>
@@ -1203,7 +1203,7 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                   <div className="absolute top-3 left-3">
                     <Tag label={item.category} />
                   </div>
@@ -1243,7 +1243,7 @@ function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; s
           <h1 className="font-['Inter'] font-semibold text-[44px] text-[#f3e0b7] leading-tight mt-5 mb-4">{item.title}</h1>
           <p className="text-[#f3d7af] text-base mb-10">{item.date} · Por Equipe LabSul</p>
           <div className="mb-10">
-            <ImgPlaceholder className="w-full h-[350px]" label="foto em breve" />
+            {item.img ? <img src={item.img} alt={item.title} className="w-full object-cover" style={{ maxHeight: "350px" }} /> : <ImgPlaceholder className="w-full h-[350px]" label="foto em breve" />}
           </div>
           <div className="text-[#f3d7af] text-lg leading-relaxed space-y-6">
             <p>A exposição "Matrizes do Sertão" reúne mais de 80 obras de artistas do sertão nordestino, explorando a rica tradição da xilogravura e do cordel como formas de resistência e identidade cultural.</p>
@@ -1273,7 +1273,7 @@ function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; s
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[160px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {n.img ? <img src={n.img} alt={n.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                 </div>
                 <div className="p-5">
                   <p className="text-[#f3d7af] text-[11px] mb-1">{n.date}</p>
@@ -1318,7 +1318,7 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
                 className="bg-[#3f0a0e] overflow-hidden group hover:bg-[#4a0e12] transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244]"
               >
                 <div className="relative h-[240px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {item.img ? <img src={item.img} alt={item.name} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-14 h-14 rounded-full bg-[#f53c25] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <Play size={20} fill="white" className="text-white ml-1" />
@@ -1364,7 +1364,7 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
           <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 items-start">
             <div>
               <div className="bg-[#3f0a0e] relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
-                <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                {item.img ? <img src={item.img} alt={item.name} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                 <div className="absolute inset-0 flex items-end justify-center pb-8">
                   <div className="bg-[#2b0101]/80 px-6 py-4 flex items-center gap-4 w-full mx-4">
                                         <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer" onClick={() => setShowComingSoon(true)}>
@@ -1420,7 +1420,7 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
                 className="bg-[#2e0e15] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244] group"
               >
                 <div className="relative h-[180px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {e.img ? <img src={e.img} alt={e.name} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-10 h-10 rounded-full bg-[#f53c25] flex items-center justify-center">
                       <Play size={14} fill="white" className="text-white ml-0.5" />
