@@ -33,7 +33,8 @@ type Page =
   | "atelie"
   | "atelie-inscricao"
   | "contato"
-  | "admin";
+  | "admin"
+  | "not-found";
 
 type NavigateFn = (page: Page, id?: string | number) => void;
 
@@ -54,6 +55,7 @@ function pageToPath(page: Page, id?: string | number): string {
     case "atelie-inscricao": return "/atelie/inscricao/" + (id ?? "");
     case "contato": return "/contato";
     case "admin": return "/admin";
+    case "not-found": return "/404";
     default: return "/";
   }
 }
@@ -76,7 +78,7 @@ function pathToPage(pathname: string): { page: Page; id?: string } {
   }
   if (first === "contato") return { page: "contato" };
   if (first === "admin") return { page: "admin" };
-  return { page: "home" };
+  return { page: "not-found" };
 }
 
 
@@ -460,7 +462,7 @@ function Footer({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 // ─── Pages ────────────────────────────────────────────────────────────────────
 
-function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageHome({ onNavigate }: { onNavigate: NavigateFn }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const NOTICIAS_ITEMS = useNoticias();
 
@@ -788,7 +790,7 @@ function PageSobre({ onNavigate }: { onNavigate: (p: Page) => void }) {
   );
 }
 
-function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageAcervo({ onNavigate }: { onNavigate: NavigateFn }) {
     const ACERVO_ITEMS = useCordeis();
   const [activeFilter, setActiveFilter] = useState("Todos");
   const [search, setSearch] = useState("");
@@ -982,7 +984,7 @@ function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; se
   );
 }
 
-function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageBiblioteca({ onNavigate }: { onNavigate: NavigateFn }) {
     const BIBLIOTECA_ITEMS = useLivros();
   const [search, setSearch] = useState("");
   const [activeType, setActiveType] = useState("Todos");
@@ -1175,7 +1177,7 @@ const BIBLIOTECA_ITEMS = useLivros();
   );
 }
 
-function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageNoticias({ onNavigate }: { onNavigate: NavigateFn }) {
   const NOTICIAS_ITEMS = useNoticias();
   const categories = ["Todos", "Exposição", "Oficina", "Digital", "Pesquisa", "Formação", "Instituição"];
   const [activeFilter, setActiveFilter] = useState("Todos");
@@ -1320,7 +1322,7 @@ function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; s
   );
 }
 
-function PageEntrevistas({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageEntrevistas({ onNavigate }: { onNavigate: NavigateFn }) {
 const ENTREVISTAS_ITEMS = useEntrevistas();
   return (
     <div className="bg-[#2b0101]">
@@ -1555,7 +1557,7 @@ function PageGaleria() {
   );
 }
 
-function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageAtelie({ onNavigate }: { onNavigate: NavigateFn }) {
   const workshops = useWorkshops();
   return (
     <div className="bg-[#2b0101]">
@@ -1925,6 +1927,21 @@ function PageContato() {
   );
 }
 
+function PageNotFound({ onNavigate }: { onNavigate: NavigateFn }) {
+  return (
+    <div className="bg-[#2b0101] min-h-[60vh] flex items-center justify-center px-6 py-20">
+      <div className="text-center max-w-md">
+        <p className="text-[#f53c25] text-[80px] font-semibold leading-none mb-4">404</p>
+        <h1 className="font-['Inter'] font-semibold text-[28px] text-[#f3e0b7] mb-4">Página não encontrada</h1>
+        <p className="text-[#f3d7af] text-base leading-relaxed mb-8">
+          O endereço que você tentou acessar não existe ou foi removido.
+        </p>
+        <BtnPrimary onClick={() => onNavigate("home")}>VOLTAR PARA O INÍCIO</BtnPrimary>
+      </div>
+    </div>
+  );
+}
+
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
 type AdminFieldType = "text" | "number" | "textarea" | "tags" | "image";
@@ -2176,10 +2193,20 @@ function AdminTable({ section }: { section: AdminSection }) {
     setError("");
   };
 
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
   const handleImageUpload = async (fieldKey: string, file: File | null) => {
     if (!file) return;
-    setUploadingField(fieldKey);
     setError("");
+    if (!file.type.startsWith("image/")) {
+      setError("Arquivo inválido: selecione uma imagem (JPG, PNG, WEBP...).");
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError("Imagem muito grande: o limite é 5MB.");
+      return;
+    }
+    setUploadingField(fieldKey);
     const ext = file.name.split(".").pop();
     const path = `${section.table}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const { error: uploadError } = await supabase.storage.from("imagens").upload(path, file, { upsert: true });
@@ -2461,6 +2488,7 @@ const location = useLocation();
       case "atelie-inscricao": return <PageAtelieInscricao onNavigate={navigate} selectedId={selectedId ?? undefined} />;
       case "contato":          return <PageContato />;
       case "admin": return <PageAdmin onNavigate={navigate} />;
+      case "not-found": return <PageNotFound onNavigate={navigate} />;
     }
   };
 
