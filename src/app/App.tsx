@@ -33,7 +33,8 @@ type Page =
   | "atelie"
   | "atelie-inscricao"
   | "contato"
-  | "admin";
+  | "admin"
+  | "not-found";
 
 type NavigateFn = (page: Page, id?: string | number) => void;
 
@@ -54,6 +55,7 @@ function pageToPath(page: Page, id?: string | number): string {
     case "atelie-inscricao": return "/atelie/inscricao/" + (id ?? "");
     case "contato": return "/contato";
     case "admin": return "/admin";
+    case "not-found": return "/404";
     default: return "/";
   }
 }
@@ -76,7 +78,7 @@ function pathToPage(pathname: string): { page: Page; id?: string } {
   }
   if (first === "contato") return { page: "contato" };
   if (first === "admin") return { page: "admin" };
-  return { page: "home" };
+  return { page: "not-found" };
 }
 
 
@@ -460,7 +462,7 @@ function Footer({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 // ─── Pages ────────────────────────────────────────────────────────────────────
 
-function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageHome({ onNavigate }: { onNavigate: NavigateFn }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const NOTICIAS_ITEMS = useNoticias();
 
@@ -651,7 +653,7 @@ function PageHome({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[256px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                 </div>
                 <div className="p-6">
                   <p className="text-[#f3e0b7] text-[12px] mb-2">{item.date}</p>
@@ -788,7 +790,7 @@ function PageSobre({ onNavigate }: { onNavigate: (p: Page) => void }) {
   );
 }
 
-function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageAcervo({ onNavigate }: { onNavigate: NavigateFn }) {
     const ACERVO_ITEMS = useCordeis();
   const [activeFilter, setActiveFilter] = useState("Todos");
   const [search, setSearch] = useState("");
@@ -796,8 +798,8 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
   const filtered = ACERVO_ITEMS.filter((item) => {
       const matchCat = activeFilter === "Todos" || item.category === activeFilter;
     const matchSearch =
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.category.toLowerCase().includes(search.toLowerCase());
+      (item.title || "").toLowerCase().includes(search.toLowerCase()) ||
+      (item.category || "").toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
@@ -864,7 +866,7 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  <ImgPlaceholder className="w-full h-full" label="imagem em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="imagem em breve" />}
                   <div className="absolute top-3 left-3">
                     <Tag label={item.category} />
                   </div>
@@ -885,10 +887,20 @@ function PageAcervo({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
   const ACERVO_ITEMS = useCordeis();
-    const item = ACERVO_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ACERVO_ITEMS[0];
+    const item = ACERVO_ITEMS.find((i) => String(i.id) === String(selectedId));
     if (!item) {
-          return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+          if (ACERVO_ITEMS.length === 0) {
+            return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+          }
+          return (
+            <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+              <p className="text-xl mb-6">Item não encontrado.</p>
+              <BtnPrimary onClick={() => onNavigate("acervo")}>VOLTAR PARA O ACERVO</BtnPrimary>
+            </div>
+          );
     }
+    const relatedAcervo = ACERVO_ITEMS.filter((i) => i.id !== item.id && i.category === item.category);
+    const acervoRelacionados = (relatedAcervo.length > 0 ? relatedAcervo : ACERVO_ITEMS.filter((i) => i.id !== item.id)).slice(0, 3);
     return (
         <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -946,16 +958,18 @@ function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; se
       <section className="bg-[#fbdfb5] py-16">
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[12px] uppercase text-[#9b2220] mb-4 tracking-widest font-medium">RELACIONADOS</p>
-          <h2 className="font-['Inter'] font-medium text-[32px] text-[#2e0e15] mb-8">Outros itens de Xilogravura</h2>
+          <h2 className="font-['Inter'] font-medium text-[32px] text-[#2e0e15] mb-8">
+            {relatedAcervo.length > 0 ? `Outros itens de ${item.category}` : "Outros itens do acervo"}
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {ACERVO_ITEMS.slice(1, 4).map((relItem) => (
+            {acervoRelacionados.map((relItem) => (
               <button
                 key={relItem.id}
                 onClick={() => onNavigate("acervo-item", relItem.id)}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffb928] group"
               >
                 <div className="h-[160px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="imagem em breve" />
+                  {relItem.img ? <img src={relItem.img} alt={relItem.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="imagem em breve" />}
                 </div>
                 <div className="p-4">
                   <p className="text-[#f3e0b7] text-base font-medium leading-snug">{relItem.title}</p>
@@ -970,7 +984,7 @@ function PageAcervoItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; se
   );
 }
 
-function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageBiblioteca({ onNavigate }: { onNavigate: NavigateFn }) {
     const BIBLIOTECA_ITEMS = useLivros();
   const [search, setSearch] = useState("");
   const [activeType, setActiveType] = useState("Todos");
@@ -978,8 +992,8 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
   const filtered = BIBLIOTECA_ITEMS.filter(
     (item) =>
       (activeType === "Todos" || item.type === activeType) &&
-      (item.title.toLowerCase().includes(search.toLowerCase()) ||
-        item.author.toLowerCase().includes(search.toLowerCase()))
+      ((item.title || "").toLowerCase().includes(search.toLowerCase()) ||
+        (item.author || "").toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -1044,7 +1058,7 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#a7922c] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  <ImgPlaceholder className="w-full h-full" label="capa em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="capa em breve" />}
                   <div className="absolute top-3 left-3">
                     <span className="bg-[#2e0e15] text-[#f3d7af] text-[11px] uppercase px-2 py-0.5 tracking-wide">
                       {item.type}
@@ -1067,10 +1081,19 @@ function PageBiblioteca({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
 function PageBibliotecaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
 const BIBLIOTECA_ITEMS = useLivros();
-        const item = BIBLIOTECA_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? BIBLIOTECA_ITEMS[0];
+        const item = BIBLIOTECA_ITEMS.find((i) => String(i.id) === String(selectedId));
     if (!item) {
-    return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
+    if (BIBLIOTECA_ITEMS.length === 0) {
+      return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>;
     }
+    return (
+      <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+        <p className="text-xl mb-6">Item não encontrado.</p>
+        <BtnPrimary onClick={() => onNavigate("biblioteca")}>VOLTAR PARA A BIBLIOTECA</BtnPrimary>
+      </div>
+    );
+    }
+    const bibliotecaRelacionados = BIBLIOTECA_ITEMS.filter((i) => i.id !== item.id).slice(0, 4);
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1088,7 +1111,7 @@ const BIBLIOTECA_ITEMS = useLivros();
           <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-12 items-start">
             <div>
               <div className="bg-[#a7922c] p-2">
-                <ImgPlaceholder className="w-full h-[420px]" label="capa do livro" />
+                {item.img ? <img src={item.img} alt={item.title} className="w-full object-cover" style={{ maxHeight: "420px" }} /> : <ImgPlaceholder className="w-full h-[420px]" label="capa do livro" />}
               </div>
             </div>
             <div>
@@ -1131,14 +1154,14 @@ const BIBLIOTECA_ITEMS = useLivros();
           <p className="text-[12px] uppercase text-[#9b2220] mb-4 tracking-widest font-medium">RELACIONADOS</p>
           <h2 className="font-['Inter'] font-medium text-[32px] text-[#2e0e15] mb-8">Outros livros e materiais</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {BIBLIOTECA_ITEMS.slice(1, 5).map((b) => (
+            {bibliotecaRelacionados.map((b) => (
               <button
                 key={b.id}
                 onClick={() => onNavigate("biblioteca-item", b.id)}
                 className="bg-[#a7922c] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2e0e15] group"
               >
                 <div className="h-[160px]">
-                  <ImgPlaceholder className="w-full h-full" label="capa em breve" />
+                  {b.img ? <img src={b.img} alt={b.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="capa em breve" />}
                 </div>
                 <div className="p-4">
                   <p className="text-[#2e0e15] text-base font-medium leading-snug">{b.title}</p>
@@ -1154,7 +1177,7 @@ const BIBLIOTECA_ITEMS = useLivros();
   );
 }
 
-function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageNoticias({ onNavigate }: { onNavigate: NavigateFn }) {
   const NOTICIAS_ITEMS = useNoticias();
   const categories = ["Todos", "Exposição", "Oficina", "Digital", "Pesquisa", "Formação", "Instituição"];
   const [activeFilter, setActiveFilter] = useState("Todos");
@@ -1203,7 +1226,7 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[200px] overflow-hidden relative">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {item.img ? <img src={item.img} alt={item.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                   <div className="absolute top-3 left-3">
                     <Tag label={item.category} />
                   </div>
@@ -1224,7 +1247,17 @@ function PageNoticias({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? NOTICIAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  const NOTICIAS_ITEMS = useNoticias(); const item = NOTICIAS_ITEMS.find((i) => String(i.id) === String(selectedId));
+  if (!item) {
+    if (NOTICIAS_ITEMS.length === 0) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    return (
+      <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+        <p className="text-xl mb-6">Notícia não encontrada.</p>
+        <BtnPrimary onClick={() => onNavigate("noticias")}>VOLTAR PARA NOTÍCIAS</BtnPrimary>
+      </div>
+    );
+  }
+  const noticiasRelacionadas = NOTICIAS_ITEMS.filter((i) => i.id !== item.id).slice(0, 3);
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1243,7 +1276,7 @@ function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; s
           <h1 className="font-['Inter'] font-semibold text-[44px] text-[#f3e0b7] leading-tight mt-5 mb-4">{item.title}</h1>
           <p className="text-[#f3d7af] text-base mb-10">{item.date} · Por Equipe LabSul</p>
           <div className="mb-10">
-            <ImgPlaceholder className="w-full h-[350px]" label="foto em breve" />
+            {item.img ? <img src={item.img} alt={item.title} className="w-full object-cover" style={{ maxHeight: "350px" }} /> : <ImgPlaceholder className="w-full h-[350px]" label="foto em breve" />}
           </div>
           <div className="text-[#f3d7af] text-lg leading-relaxed space-y-6">
             <p>A exposição "Matrizes do Sertão" reúne mais de 80 obras de artistas do sertão nordestino, explorando a rica tradição da xilogravura e do cordel como formas de resistência e identidade cultural.</p>
@@ -1266,14 +1299,14 @@ function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; s
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[#2b0101] text-[12px] uppercase mb-6 tracking-widest font-medium">OUTRAS NOTÍCIAS</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {NOTICIAS_ITEMS.slice(1, 4).map((n) => (
+            {noticiasRelacionadas.map((n) => (
               <button
                 key={n.id}
                 onClick={() => onNavigate("noticia-item", n.id)}
                 className="bg-[#9b2220] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-black group"
               >
                 <div className="h-[160px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {n.img ? <img src={n.img} alt={n.title} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                 </div>
                 <div className="p-5">
                   <p className="text-[#f3d7af] text-[11px] mb-1">{n.date}</p>
@@ -1289,7 +1322,7 @@ function PageNoticiaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; s
   );
 }
 
-function PageEntrevistas({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageEntrevistas({ onNavigate }: { onNavigate: NavigateFn }) {
 const ENTREVISTAS_ITEMS = useEntrevistas();
   return (
     <div className="bg-[#2b0101]">
@@ -1318,7 +1351,7 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
                 className="bg-[#3f0a0e] overflow-hidden group hover:bg-[#4a0e12] transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244]"
               >
                 <div className="relative h-[240px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {item.img ? <img src={item.img} alt={item.name} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-14 h-14 rounded-full bg-[#f53c25] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <Play size={20} fill="white" className="text-white ml-1" />
@@ -1346,7 +1379,17 @@ const ENTREVISTAS_ITEMS = useEntrevistas();
 }
 
 function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-    const [showComingSoon, setShowComingSoon] = useState(false); const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId)) ?? ENTREVISTAS_ITEMS[0]; if (!item) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    const [showComingSoon, setShowComingSoon] = useState(false); const ENTREVISTAS_ITEMS = useEntrevistas(); const item = ENTREVISTAS_ITEMS.find((i) => String(i.id) === String(selectedId));
+    if (!item) {
+      if (ENTREVISTAS_ITEMS.length === 0) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+      return (
+        <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+          <p className="text-xl mb-6">Entrevista não encontrada.</p>
+          <BtnPrimary onClick={() => onNavigate("entrevistas")}>VOLTAR PARA ENTREVISTAS</BtnPrimary>
+        </div>
+      );
+    }
+    const entrevistasRelacionadas = ENTREVISTAS_ITEMS.filter((i) => i.id !== item.id).slice(0, 3);
   return (
     <div className="bg-[#2b0101]">
       <div className="max-w-[1440px] mx-auto px-10 py-5">
@@ -1364,7 +1407,7 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
           <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-12 items-start">
             <div>
               <div className="bg-[#3f0a0e] relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
-                <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                {item.img ? <img src={item.img} alt={item.name} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                 <div className="absolute inset-0 flex items-end justify-center pb-8">
                   <div className="bg-[#2b0101]/80 px-6 py-4 flex items-center gap-4 w-full mx-4">
                                         <div className="w-12 h-12 rounded-full bg-[#f53c25] flex items-center justify-center flex-shrink-0 hover:bg-[#ca1419] transition-colors cursor-pointer" onClick={() => setShowComingSoon(true)}>
@@ -1413,14 +1456,14 @@ function PageEntrevistaItem({ onNavigate, selectedId }: { onNavigate: NavigateFn
         <div className="max-w-[1440px] mx-auto px-10">
           <p className="text-[12px] uppercase text-[#2e0e15] mb-4 tracking-widest font-medium">OUTRAS ENTREVISTAS</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {ENTREVISTAS_ITEMS.slice(1, 4).map((e) => (
+            {entrevistasRelacionadas.map((e) => (
               <button
                 key={e.id}
                 onClick={() => onNavigate("entrevista-item", e.id)}
                 className="bg-[#2e0e15] text-left overflow-hidden hover:scale-[1.01] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d9b244] group"
               >
                 <div className="relative h-[180px] overflow-hidden">
-                  <ImgPlaceholder className="w-full h-full" label="foto em breve" />
+                  {e.img ? <img src={e.img} alt={e.name} className="w-full h-full object-cover" /> : <ImgPlaceholder className="w-full h-full" label="foto em breve" />}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-10 h-10 rounded-full bg-[#f53c25] flex items-center justify-center">
                       <Play size={14} fill="white" className="text-white ml-0.5" />
@@ -1514,7 +1557,7 @@ function PageGaleria() {
   );
 }
 
-function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function PageAtelie({ onNavigate }: { onNavigate: NavigateFn }) {
   const workshops = useWorkshops();
   return (
     <div className="bg-[#2b0101]">
@@ -1595,12 +1638,20 @@ function PageAtelie({ onNavigate }: { onNavigate: (p: Page) => void }) {
 }
 
 function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateFn; selectedId?: string | number }) {
-  const workshops = useWorkshops(); const workshop = workshops.find((w) => String(w.id) === String(selectedId)) ?? workshops[0];
+  const workshops = useWorkshops(); const workshop = workshops.find((w) => String(w.id) === String(selectedId));
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  if (!workshop) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+  if (!workshop) {
+    if (workshops.length === 0) { return <div className="bg-[#2b0101] text-[#f3e0b7] p-10">Carregando...</div>; }
+    return (
+      <div className="bg-[#2b0101] text-[#f3e0b7] p-10 text-center">
+        <p className="text-xl mb-6">Oficina não encontrada.</p>
+        <BtnPrimary onClick={() => onNavigate("atelie")}>VOLTAR PARA O ATELIÊ</BtnPrimary>
+      </div>
+    );
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -1644,7 +1695,11 @@ function PageAtelieInscricao({ onNavigate, selectedId }: { onNavigate: NavigateF
               <h1 className="font-['Inter'] font-semibold text-[40px] text-[#2e0e15] leading-tight mb-6">{workshop.title}</h1>
 
               <div className="bg-[#9b2220] p-2 mb-8 overflow-hidden" style={{ maxWidth: "420px" }}>
-                <img src={workshop.img} alt={workshop.title} className="w-full object-cover opacity-80" style={{ maxHeight: "260px" }} />
+                {workshop.img ? (
+                  <img src={workshop.img} alt={workshop.title} className="w-full object-cover opacity-80" style={{ maxHeight: "260px" }} />
+                ) : (
+                  <ImgPlaceholder className="w-full h-[260px]" label="imagem em breve" />
+                )}
               </div>
 
               <p className="text-[#2f0f16] text-base leading-relaxed mb-8">{workshop.desc}</p>
@@ -1868,6 +1923,21 @@ function PageContato() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function PageNotFound({ onNavigate }: { onNavigate: NavigateFn }) {
+  return (
+    <div className="bg-[#2b0101] min-h-[60vh] flex items-center justify-center px-6 py-20">
+      <div className="text-center max-w-md">
+        <p className="text-[#f53c25] text-[80px] font-semibold leading-none mb-4">404</p>
+        <h1 className="font-['Inter'] font-semibold text-[28px] text-[#f3e0b7] mb-4">Página não encontrada</h1>
+        <p className="text-[#f3d7af] text-base leading-relaxed mb-8">
+          O endereço que você tentou acessar não existe ou foi removido.
+        </p>
+        <BtnPrimary onClick={() => onNavigate("home")}>VOLTAR PARA O INÍCIO</BtnPrimary>
+      </div>
     </div>
   );
 }
@@ -2123,10 +2193,20 @@ function AdminTable({ section }: { section: AdminSection }) {
     setError("");
   };
 
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
   const handleImageUpload = async (fieldKey: string, file: File | null) => {
     if (!file) return;
-    setUploadingField(fieldKey);
     setError("");
+    if (!file.type.startsWith("image/")) {
+      setError("Arquivo inválido: selecione uma imagem (JPG, PNG, WEBP...).");
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError("Imagem muito grande: o limite é 5MB.");
+      return;
+    }
+    setUploadingField(fieldKey);
     const ext = file.name.split(".").pop();
     const path = `${section.table}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const { error: uploadError } = await supabase.storage.from("imagens").upload(path, file, { upsert: true });
@@ -2408,6 +2488,7 @@ const location = useLocation();
       case "atelie-inscricao": return <PageAtelieInscricao onNavigate={navigate} selectedId={selectedId ?? undefined} />;
       case "contato":          return <PageContato />;
       case "admin": return <PageAdmin onNavigate={navigate} />;
+      case "not-found": return <PageNotFound onNavigate={navigate} />;
     }
   };
 
